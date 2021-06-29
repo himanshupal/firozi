@@ -1,0 +1,49 @@
+@import "./variables";
+
+.title {
+	font-weight: bold;
+	font-size: 20px;
+	color: $crimson;
+}
+
+.sections {
+	margin: 0.5rem 0;
+	padding: 0.5rem 0;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+
+	overflow-y: scroll;
+
+	.section {
+		color: black;
+
+		.list {
+			&-title {
+				font-size: 18px;
+
+				display: flex;
+				gap: 5px;
+				align-items: center;
+			}
+		}
+
+		> li {
+			&:first-child {
+				font-size: 22px;
+			}
+		}
+
+		&:first-child {
+			margin-top: unset;
+		}
+		&:last-child {
+			margin-bottom: unset;
+		}
+	}
+}
+
+.button {
+	&--filter {
+		border-top: 1px solid black;
+	}
+}

@@ -1,0 +1,180 @@
+@import "./login.module.scss";
+@import "./layout.module.scss";
+@import "./categoryfilter.module.scss";
+
+@import "./variables";
+
+@import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
+// @import "https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css";
+
+body {
+	margin: unset;
+
+	* {
+		font-family: "Viaoda Libre";
+	}
+
+	a {
+		color: inherit;
+		text-decoration: unset;
+	}
+
+	ul {
+		list-style: none;
+	}
+
+	::-webkit-scrollbar {
+		width: 10px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: antiquewhite;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: $blue;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: $crimson;
+	}
+}
+
+.container {
+	margin: 0;
+	overflow: hidden;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+.h {
+	&-screen {
+		height: calc(100vh - 94px);
+	}
+	&-full {
+		height: 100%;
+	}
+
+	&-login {
+		height: calc(100vh - 47px);
+	}
+}
+
+.flex {
+	display: flex;
+
+	&-column {
+		flex-direction: column;
+	}
+
+	&-grow {
+		flex-grow: 1;
+	}
+}
+
+.gap {
+	&-1 {
+		gap: 4px;
+	}
+	&-2 {
+		gap: 8px;
+	}
+	&-3 {
+		gap: 16px;
+	}
+}
+
+.align {
+	&-items-center {
+		align-items: center;
+	}
+	&-items-end {
+		align-items: flex-end;
+	}
+	&-items-start {
+		align-items: flex-start;
+	}
+}
+
+.text {
+	&-left {
+		text-align: left;
+	}
+	&-center {
+		text-align: center;
+	}
+	&-right {
+		text-align: right;
+	}
+	&-justify {
+		text-align: justify;
+	}
+}
+
+.justify {
+	&-content-center {
+		justify-content: center;
+	}
+	&-content-between {
+		justify-content: space-between;
+	}
+	&-content-around {
+		justify-content: space-around;
+	}
+	&-content-end {
+		justify-content: flex-end;
+	}
+}
+
+.w-min {
+	width: min-content;
+}
+
+.bg {
+	&-yellow {
+		background-color: $yellow;
+	}
+	&-blue {
+		background-color: $blue;
+	}
+}
+
+.input {
+	border: unset;
+	padding: 1rem;
+	margin: 0.5rem;
+	border-radius: 4px;
+}
+
+.button {
+	background: none;
+	cursor: pointer;
+
+	color: $yellow;
+	background: $blue;
+
+	padding: 0.5rem;
+	font-size: 20px;
+
+	border-radius: 8px;
+	border: 2px solid $yellow;
+
+	filter: drop-shadow(4px 4px 0 #000);
+
+	&:hover {
+		filter: drop-shadow(3px 3px 0 #000);
+	}
+}
+
+.card {
+	font-size: 20px;
+	margin: 0 auto;
+	width: 75%;
+
+	&__icon {
+		color: $blue;
+		background: $yellow;
+	}
+}
