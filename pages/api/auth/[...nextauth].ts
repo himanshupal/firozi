@@ -7,9 +7,18 @@ import Providers from "next-auth/providers"
 
 const options: NextAuthOptions = {
 	providers: [
-		Providers.GitHub({
-			clientId: process.env.GITHUB_ID,
-			clientSecret: process.env.GITHUB_SECRET
+		Providers.Email({
+			server: {
+				port: 465,
+				host: "smtp.gmail.com",
+				secure: true,
+				auth: {
+					user: process.env.EMAIL_USERNAME,
+					pass: process.env.EMAIL_PASSWORD
+				},
+				tls: { rejectUnauthorized: false }
+			},
+			from: process.env.EMAIL_FROM
 		}),
 		Providers.Google({
 			clientId: process.env.GOOGLE_ID,
@@ -18,6 +27,10 @@ const options: NextAuthOptions = {
 		Providers.LinkedIn({
 			clientId: process.env.LINKEDIN_ID,
 			clientSecret: process.env.LINKEDIN_SECRET
+		}),
+		Providers.GitHub({
+			clientId: process.env.GITHUB_ID,
+			clientSecret: process.env.GITHUB_SECRET
 		}),
 		Providers.Zoom({
 			clientId: process.env.ZOOM_ID,
@@ -28,7 +41,8 @@ const options: NextAuthOptions = {
 		maxAge: 30 * 24 * 60 * 60
 	},
 	secret: process.env.AUTH_SECRET,
-	adapter: Adapters.Prisma.Adapter({ prisma: new PrismaClient() })
+	database: process.env.MONGO_URI
+	// adapter: Adapters.Prisma.Adapter({ prisma: new PrismaClient() })
 }
 
 const authHandler: NextApiHandler = async (req, res) => {
