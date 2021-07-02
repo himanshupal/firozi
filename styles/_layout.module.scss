@@ -2,6 +2,7 @@
 
 .panel {
 	padding: 1rem;
+	overflow: auto;
 
 	&--side {
 		width: 25%;
@@ -12,7 +13,7 @@
 		width: 75%;
 		color: $yellow;
 
-		filter: drop-shadow(0 0 5px $blue);
+		// filter: drop-shadow(0 0 5px $blue);
 	}
 }
 

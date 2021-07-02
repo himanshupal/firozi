@@ -1,0 +1,19 @@
+type Ad {
+	_id: ID
+	title: String!
+	description: String
+	category: String!
+	images: [Image!]!
+	price: Float!
+	discount: Float
+	discountTill: Float
+	usedFor: String
+	condition: String!
+	shippingHandler: String
+	pfAvailable: Boolean
+	workingHours: Int!
+	offlineOnly: Boolean
+	location: String!
+	createdAt: String!
+	createdBy: User!
+}

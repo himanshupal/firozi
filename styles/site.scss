@@ -1,8 +1,10 @@
 @import "./login.module.scss";
 @import "./layout.module.scss";
 @import "./categoryfilter.module.scss";
+@import "./slider.module.scss";
 
 @import "./variables";
+@import "./input";
 
 @import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
 // @import "https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css";
@@ -28,7 +30,7 @@ body {
 	}
 
 	::-webkit-scrollbar-track {
-		background: antiquewhite;
+		background: blue;
 	}
 
 	::-webkit-scrollbar-thumb {

@@ -1,0 +1,39 @@
+@import "./variables";
+
+.fields {
+	width: 66.6%;
+}
+
+.field {
+	width: 65%;
+	padding: 0.5rem;
+	background: yellow;
+	border-radius: 4px;
+	margin-bottom: 0.75rem;
+	filter: drop-shadow(2px 2px 0 #000);
+	transition: all 150ms ease-in-out;
+
+	&--focused {
+		filter: drop-shadow(4px 4px 0 #000);
+	}
+
+	&__label {
+		color: black;
+		display: block;
+		font-size: 22px;
+	}
+
+	&__input {
+		width: calc(100% - 1rem);
+		height: 2.5rem;
+		color: $blue;
+		font-size: 25px;
+		padding: 0 8px;
+		margin-top: 0.5rem;
+		border: none;
+
+		&:focus-visible {
+			outline: none;
+		}
+	}
+}

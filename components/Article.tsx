@@ -1,9 +1,18 @@
-const Aside = (): JSX.Element => {
+import React, { HTMLAttributes } from "react"
+
+interface ArticleProps extends HTMLAttributes<HTMLDivElement> {
+	children: JSX.Element | Array<JSX.Element>
+}
+
+const Article: React.FC<ArticleProps> = ({
+	children,
+	className
+}): JSX.Element => {
 	return (
-		<article className="panel panel--main flex align-items-center bg-blue">
-			Firozi Local Listings
+		<article className={`panel panel--main bg-blue ${className}`}>
+			{children}
 		</article>
 	)
 }
 
-export default Aside
+export default Article
