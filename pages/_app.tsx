@@ -5,6 +5,7 @@ import Header from "../components/Header"
 import Footer from "../components/Footer"
 
 import "../styles/site.scss"
+import "tailwindcss/tailwind.css"
 import "@egjs/react-flicking/dist/flicking.css"
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {

@@ -6,7 +6,9 @@ import Article from "../components/Article"
 const Home = (): JSX.Element => (
 	<Fragment>
 		<Aside />
-		<Article />
+		<Article>
+			<div>This is Text.</div>
+		</Article>
 	</Fragment>
 )
 

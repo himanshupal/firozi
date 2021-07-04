@@ -1,4 +1,4 @@
-import { FC, InputHTMLAttributes, useState } from "react"
+import { FC, InputHTMLAttributes } from "react"
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 	name: string
@@ -7,27 +7,17 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input: FC<InputProps> = ({ name, label, type = "text", ...rest }) => {
-	const [focus, setFocus] = useState<Boolean>(false)
-
-	const toggleOutline = () => setFocus((focus) => !focus)
-
 	return (
-		<div
-			className={focus ? "field field--focused" : "field"}
-			onFocus={toggleOutline}
-			onBlur={toggleOutline}
-		>
+		<div className="py-3 px-8">
 			{label && (
-				<label htmlFor={name} className="field__label">
+				<label
+					htmlFor={name}
+					className="block pl-2 text-white text-lg font-cursive"
+				>
 					{label}
 				</label>
 			)}
-			<input
-				name={name}
-				className={`field__input field__${type}`}
-				type={type}
-				{...rest}
-			/>
+			<input name={name} className="w-full px-2 h-8" type={type} {...rest} />
 		</div>
 	)
 }

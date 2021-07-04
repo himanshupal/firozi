@@ -5,7 +5,7 @@ const Ad = (): JSX.Element => {
 		query: { ad }
 	} = useRouter()
 
-	return <div>{ad}</div>
+	return <div className="flex">{ad}</div>
 }
 
 export default Ad

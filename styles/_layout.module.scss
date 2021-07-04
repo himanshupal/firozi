@@ -17,19 +17,19 @@
 	}
 }
 
-.header,
-.footer {
-	padding: 0.75rem;
-	color: antiquewhite;
-	background-color: $crimson;
-}
+// .header,
+// .footer {
+// 	padding: 0.75rem;
+// 	color: antiquewhite;
+// 	background-color: $crimson;
+// }
 
-.header {
-	&__hero {
-		line-height: 0;
-		font-size: xx-large;
-	}
-	&__navlinks {
-		gap: 1rem;
-	}
-}
+// .header {
+// 	&__hero {
+// 		line-height: 0;
+// 		font-size: xx-large;
+// 	}
+// 	&__navlinks {
+// 		gap: 1rem;
+// 	}
+// }

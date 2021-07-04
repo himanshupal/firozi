@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from "react"
 
 interface ArticleProps extends HTMLAttributes<HTMLDivElement> {
-	children: JSX.Element | Array<JSX.Element>
+	children?: JSX.Element | Array<JSX.Element>
 }
 
 const Article: React.FC<ArticleProps> = ({

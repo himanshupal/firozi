@@ -7,14 +7,15 @@
 @import "./input";
 
 @import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playball&family=Sen:wght@400;700;800&family=Srisakdi&display=swap");
 // @import "https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css";
 
 body {
 	margin: unset;
 
-	* {
-		font-family: "Viaoda Libre";
-	}
+	// * {
+	// 	font-family: "Viaoda Libre";
+	// }
 
 	a {
 		color: inherit;
@@ -25,21 +26,21 @@ body {
 		list-style: none;
 	}
 
-	::-webkit-scrollbar {
-		width: 10px;
-	}
+	// ::-webkit-scrollbar {
+	// 	width: 10px;
+	// }
 
-	::-webkit-scrollbar-track {
-		background: blue;
-	}
+	// ::-webkit-scrollbar-track {
+	// 	background: blue;
+	// }
 
-	::-webkit-scrollbar-thumb {
-		background: $blue;
-	}
+	// ::-webkit-scrollbar-thumb {
+	// 	background: $blue;
+	// }
 
-	::-webkit-scrollbar-thumb:hover {
-		background: $crimson;
-	}
+	// ::-webkit-scrollbar-thumb:hover {
+	// 	background: $crimson;
+	// }
 }
 
 .container {
@@ -64,41 +65,41 @@ body {
 	}
 }
 
-.flex {
-	display: flex;
+// .flex {
+// 	display: flex;
 
-	&-column {
-		flex-direction: column;
-	}
+// 	&-column {
+// 		flex-direction: column;
+// 	}
 
-	&-grow {
-		flex-grow: 1;
-	}
-}
+// 	&-grow {
+// 		flex-grow: 1;
+// 	}
+// }
 
-.gap {
-	&-1 {
-		gap: 4px;
-	}
-	&-2 {
-		gap: 8px;
-	}
-	&-3 {
-		gap: 16px;
-	}
-}
+// .gap {
+// 	&-1 {
+// 		gap: 4px;
+// 	}
+// 	&-2 {
+// 		gap: 8px;
+// 	}
+// 	&-3 {
+// 		gap: 16px;
+// 	}
+// }
 
-.align {
-	&-items-center {
-		align-items: center;
-	}
-	&-items-end {
-		align-items: flex-end;
-	}
-	&-items-start {
-		align-items: flex-start;
-	}
-}
+// .align {
+// 	&-items-center {
+// 		align-items: center;
+// 	}
+// 	&-items-end {
+// 		align-items: flex-end;
+// 	}
+// 	&-items-start {
+// 		align-items: flex-start;
+// 	}
+// }
 
 .text {
 	&-left {
@@ -115,20 +116,20 @@ body {
 	}
 }
 
-.justify {
-	&-content-center {
-		justify-content: center;
-	}
-	&-content-between {
-		justify-content: space-between;
-	}
-	&-content-around {
-		justify-content: space-around;
-	}
-	&-content-end {
-		justify-content: flex-end;
-	}
-}
+// .justify {
+// 	&-content-center {
+// 		justify-content: center;
+// 	}
+// 	&-content-between {
+// 		justify-content: space-between;
+// 	}
+// 	&-content-around {
+// 		justify-content: space-around;
+// 	}
+// 	&-content-end {
+// 		justify-content: flex-end;
+// 	}
+// }
 
 .w-min {
 	width: min-content;
