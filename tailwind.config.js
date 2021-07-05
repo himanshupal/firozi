@@ -11,7 +11,7 @@ module.exports = {
 				blood: "#67000c"
 			},
 			height: {
-				menu: "calc(100vh - 52px)"
+				content: "calc(100vh - 52px)"
 			},
 			inset: {
 				header: "52px"

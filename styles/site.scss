@@ -26,21 +26,28 @@ body {
 		list-style: none;
 	}
 
-	// ::-webkit-scrollbar {
-	// 	width: 10px;
-	// }
+	::-webkit-scrollbar {
+		width: 5px;
+		height: 5px;
+	}
 
-	// ::-webkit-scrollbar-track {
-	// 	background: blue;
-	// }
+	::-webkit-scrollbar-track {
+		background: #fff;
+	}
 
-	// ::-webkit-scrollbar-thumb {
-	// 	background: $blue;
-	// }
+	::-webkit-scrollbar-thumb {
+		background: #ccc;
+		border-radius: 2.5px;
+	}
 
-	// ::-webkit-scrollbar-thumb:hover {
-	// 	background: $crimson;
-	// }
+	::-webkit-scrollbar-thumb:hover {
+		background: #ccc;
+	}
+
+	*::selection {
+		color: white;
+		background-color: #67000c;
+	}
 }
 
 .container {
