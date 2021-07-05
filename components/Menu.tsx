@@ -1,11 +1,7 @@
-import Link from "next/link"
-
-import routes from "data/navlinks"
-
 const Menu = (): JSX.Element => {
 	return (
 		<div className="h-content flex flex-col overflow-auto bg-blood absolute top-header z-10 min-w-full md:min-w-max md:w-1/4">
-			<div className="border-t-2 md:py-4">
+			<div className="border-t-2 md:py-4 block md:hidden">
 				<div className="pb-3 px-8">
 					<label
 						htmlFor="search"
@@ -97,15 +93,6 @@ const Menu = (): JSX.Element => {
 				</div>
 			</div>
 
-			<div className="border-t-2 pt-1 block md:hidden">
-				{routes.map(({ path, text }, index) => (
-					<Link href={path} key={index}>
-						<div className="text-white text-lg sm:text-xl font-cursive pl-10 py-1">
-							{text}
-						</div>
-					</Link>
-				))}
-			</div>
 			<div className="border-t-2 p-1 text-white text-center text-xs font-thin block md:hidden">
 				&copy; {new Date().getFullYear()} Firozi Inc.
 			</div>

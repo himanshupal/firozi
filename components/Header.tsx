@@ -25,68 +25,34 @@ const Header = (): JSX.Element => {
 					</Link>
 				</div>
 				<div className="flex items-center gap-5">
-					{!loading && session ? (
-						<>
-							<div
-								className="text-sm cursor-pointer block md:hidden"
-								onClick={async () => await signOut()}
-							>
-								Logout
-							</div>
-							<div className="block md:hidden">
-								<Link
-									href={`/profile/${session?.user?.email}`}
-									children={
-										<img className="cursor-pointer" src="/icons/profile.svg" />
-									}
-								/>
-							</div>
-						</>
-					) : (
-						<div
-							className="block md:hidden text-sm cursor-pointer"
-							onClick={async () => await signIn()}
-						>
-							Login
-						</div>
-					)}
 					<input name="search" className="hidden md:block w-full px-2 h-8" />
 					<input name="location" className="hidden md:block w-full px-2 h-8" />
 					<img
-						className="hidden md:block cursor-pointer"
+						className="rounded-full cursor-pointer"
 						src="/icons/profile.svg"
-						onClick={() => (session ? setHover((hover) => !hover) : signIn())}
+						onClick={async () =>
+							session ? setHover((hover) => !hover) : await signIn()
+						}
 					/>
 				</div>
 			</header>
 
-			{hover && (
-				<div className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 px-6 m-2">
-					{!loading && session ? (
-						<>
-							<Link href={`/profile/${session?.user?.email}`}>
-								<div className="cursor-pointer py-1">Profile</div>
-							</Link>
-							{routes.map(({ path, text }, index) => (
-								<Link href={path} key={index}>
-									<div className="cursor-pointer py-1">{text}</div>
-								</Link>
-							))}
-							<div
-								className="cursor-pointer py-1"
-								onClick={async () => await signOut()}
-							>
-								Logout
-							</div>
-						</>
-					) : (
-						<div
-							className="cursor-pointer py-1"
-							onClick={async () => await signIn()}
-						>
-							Login
-						</div>
-					)}
+			{hover && !loading && session && (
+				<div className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 m-2">
+					<Link href={`/profile/${session?.user?.email}`}>
+						<div className="cursor-pointer my-1 px-6">Profile</div>
+					</Link>
+					{routes.map(({ path, text }, index) => (
+						<Link href={path} key={index}>
+							<div className="cursor-pointer my-1 px-6">{text}</div>
+						</Link>
+					))}
+					<div
+						className="cursor-pointer my-1 px-6"
+						onClick={async () => await signOut()}
+					>
+						Logout
+					</div>
 				</div>
 			)}
 

@@ -22,7 +22,7 @@ const routes: Array<Route> = [
   },
   {
     path: "",
-    text: "Settings"
+    text: "Preferences"
   }
 ]
 
