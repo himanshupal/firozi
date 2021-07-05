@@ -1,4 +1,4 @@
 module.exports = {
-  reactStrictMode: true,
-  telemetry: false,
+	// reactStrictMode: true,
+	telemetry: false
 }

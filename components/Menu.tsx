@@ -1,4 +1,10 @@
+import { Range } from "rc-slider"
+import "rc-slider/assets/index.css"
+import { useState } from "react"
+
 const Menu = (): JSX.Element => {
+	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })
+
 	return (
 		<div className="h-content flex flex-col overflow-auto bg-blood absolute top-header z-10 min-w-full md:min-w-max md:w-1/4">
 			<div className="border-t-2 md:py-4 block md:hidden">
@@ -37,14 +43,29 @@ const Menu = (): JSX.Element => {
 						<option value="postOld">Oldest First</option>
 					</select>
 				</div>
-				<div className="pb-3 px-8">
+				<div className="pb-6 px-8">
 					<label
 						htmlFor="price"
 						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
 					>
 						Price
 					</label>
-					<input name="price" className="w-full px-2 h-8" />
+					<Range
+						max={1500}
+						step={50}
+						defaultValue={[min, max]}
+						onChange={([min, max]) => setRange({ min, max })}
+						marks={{
+							[min]: {
+								style: { color: "white" },
+								label: min === 0 ? "MIN" : min
+							},
+							[max]: {
+								style: { color: "white" },
+								label: max === 1500 ? "MAX" : max
+							}
+						}}
+					/>
 				</div>
 				<div className="pb-3 px-8">
 					<label
