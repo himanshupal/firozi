@@ -17,6 +17,10 @@ body {
 	// 	font-family: "Viaoda Libre";
 	// }
 
+	textarea {
+		margin: unset;
+	}
+
 	a {
 		color: inherit;
 		text-decoration: unset;
@@ -26,28 +30,28 @@ body {
 		list-style: none;
 	}
 
-	::-webkit-scrollbar {
-		width: 5px;
-		height: 5px;
-	}
-
-	::-webkit-scrollbar-track {
-		background: #fff;
-	}
-
-	::-webkit-scrollbar-thumb {
-		background: #ccc;
-		border-radius: 2.5px;
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background: #ccc;
-	}
-
 	*::selection {
 		color: white;
 		background-color: #67000c;
 	}
+}
+
+::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+
+::-webkit-scrollbar-track {
+	background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #ccc;
+	border-radius: 2.5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #ccc;
 }
 
 .container {

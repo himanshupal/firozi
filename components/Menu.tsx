@@ -36,17 +36,17 @@ const Menu = (): JSX.Element => {
 					>
 						Sort by
 					</label>
-					<select name="sort" className="w-full px-2 h-8">
+					<select name="sort" className="w-full px-2 h-8 appearance-none">
 						<option value="priceInc">Price: Low to High</option>
 						<option value="priceDec">Price: High to Low</option>
 						<option value="postNew">Most Recent</option>
 						<option value="postOld">Oldest First</option>
 					</select>
 				</div>
-				<div className="pb-6 px-8">
+				<div className="pb-6 px-10">
 					<label
 						htmlFor="price"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
+						className="block text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
 					>
 						Price
 					</label>
@@ -58,11 +58,11 @@ const Menu = (): JSX.Element => {
 						marks={{
 							[min]: {
 								style: { color: "white" },
-								label: min === 0 ? "MIN" : min
+								label: min === 0 ? "MIN" : `₹${min}`
 							},
 							[max]: {
 								style: { color: "white" },
-								label: max === 1500 ? "MAX" : max
+								label: max === 1500 ? "MAX" : `₹${max}`
 							}
 						}}
 					/>

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { useRouter } from "next/router"
 
 import { signIn, signOut, useSession } from "next-auth/client"
 import { Fragment, useState } from "react"
@@ -11,6 +12,17 @@ const Header = (): JSX.Element => {
 	const [menu, setMenu] = useState(false)
 	const [hover, setHover] = useState(false)
 
+	const router = useRouter()
+
+	const routeMap = {
+		"/": "Firozi",
+		"/ad/create": "Create new Ad"
+	}
+
+	const location = Object.keys(routeMap).includes(router.pathname)
+		? routeMap[router.pathname]
+		: routeMap["/"]
+
 	return (
 		<Fragment>
 			<header className="flex items-center justify-between bg-blood text-white px-3 py-2 sticky top-0 z-10">
@@ -21,7 +33,7 @@ const Header = (): JSX.Element => {
 						onClick={() => setMenu((menu) => !menu)}
 					/>
 					<Link href="/">
-						<span className="cursor-pointer text-3xl">Firozi</span>
+						<span className="cursor-pointer text-3xl">{location}</span>
 					</Link>
 				</div>
 				<div className="flex items-center gap-5">

@@ -2,11 +2,11 @@ module.exports = {
 	purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
 	mode: "jit",
 	theme: {
-		fontFamily: {
-			cursive: ["Playball", "cursive"],
-			sans: ["Sen", "sans-serif"]
-		},
 		extend: {
+			fontFamily: {
+				cursive: ["Playball", "cursive"],
+				sans: ["Sen", "sans-serif"]
+			},
 			colors: {
 				blood: "#67000c"
 			},

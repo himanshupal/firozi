@@ -12,7 +12,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 		<Provider session={pageProps.session}>
 			<Header />
 
-			<main className="flex h-content">
+			<main className="h-content">
 				<Component {...pageProps} />
 			</main>
 		</Provider>
