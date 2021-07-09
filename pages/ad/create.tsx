@@ -5,6 +5,7 @@ const CreateAd = (): JSX.Element => {
 	const [negotiable, setNegotiable] = useState<Boolean>(false)
 	const [offlineOnly, setOfflineOnly] = useState<Boolean>(false)
 	const [images, setImages] = useState<Array<string | ArrayBuffer>>([])
+	const [list, setList] = useState<string>("")
 
 	const imageInputRef = useRef<HTMLInputElement>()
 
@@ -93,18 +94,27 @@ const CreateAd = (): JSX.Element => {
 					>
 						Category
 					</label>
-					<input
-						type="search"
-						name="category"
-						list="categories"
-						placeholder="Select a category"
-						className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
-					/>
-					<datalist id="categories">
-						<option value="Electronics > Smartphones" />
-						<option value="Jobs > Teacher" />
-						<option value="Water Purifier" />
-					</datalist>
+					<span className="relative">
+						<input
+							type="search"
+							name="category"
+							autoComplete="off"
+							onFocus={() => setList("category")}
+							onBlur={() => setList("")}
+							placeholder="Select a category"
+							className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
+						/>
+						<ul
+							className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10"
+							style={{ display: list === "category" ? "block" : "none" }}
+						>
+							<li className="px-2 cursor-pointer">
+								Electronics &gt; Smartphones
+							</li>
+							<li className="px-2 cursor-pointer">Jobs &gt; Teacher</li>
+							<li className="px-2 cursor-pointer">Water Purifier</li>
+						</ul>
+					</span>
 
 					<label
 						htmlFor="location"
@@ -112,18 +122,27 @@ const CreateAd = (): JSX.Element => {
 					>
 						Location
 					</label>
-					<input
-						type="search"
-						name="category"
-						list="categories"
-						placeholder="Select location for Ad"
-						className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600 appearance-none"
-					/>
-					<datalist id="categories">
-						<option value="Electronics > Smartphones" />
-						<option value="Jobs > Teacher" />
-						<option value="Water Purifier" />
-					</datalist>
+					<span className="relative">
+						<input
+							type="search"
+							name="location"
+							autoComplete="off"
+							onFocus={() => setList("location")}
+							onBlur={() => setList("")}
+							placeholder="Select location for Ad"
+							className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
+						/>
+						<ul
+							className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10"
+							style={{ display: list === "location" ? "block" : "none" }}
+						>
+							<li className="px-2 cursor-pointer">
+								Electronics &gt; Smartphones
+							</li>
+							<li className="px-2 cursor-pointer">Jobs &gt; Teacher</li>
+							<li className="px-2 cursor-pointer">Water Purifier</li>
+						</ul>
+					</span>
 
 					<label
 						htmlFor="workingHours"
@@ -165,7 +184,7 @@ const CreateAd = (): JSX.Element => {
 							max="250"
 							name="price"
 							placeholder="Enter Amount"
-							className="flex-grow pl-1 focus-visible:outline-none"
+							className="flex-grow pl-1 focus-visible:outline-none appearance-none"
 						/>
 						INR /
 						<select
@@ -186,10 +205,11 @@ const CreateAd = (): JSX.Element => {
 						Negotiable
 					</label>
 					<div
+						tabIndex={0}
 						onClick={() => setNegotiable((negotiable) => !negotiable)}
 						className={
 							negotiable
-								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer`
+								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer focus-visible:outline-none`
 								: `h-5 w-9 rounded-full mb-3 border-2 border-blood text-xs flex items-center justify-center text-blood cursor-pointer`
 						}
 					>
@@ -203,10 +223,11 @@ const CreateAd = (): JSX.Element => {
 						Offline Only
 					</label>
 					<div
+						tabIndex={0}
 						onClick={() => setOfflineOnly((offlineOnly) => !offlineOnly)}
 						className={
 							offlineOnly
-								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer`
+								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer focus-visible:outline-none`
 								: `h-5 w-9 rounded-full mb-3 border-2 border-blood text-xs flex items-center justify-center text-blood cursor-pointer`
 						}
 					>

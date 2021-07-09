@@ -34,6 +34,18 @@ body {
 		color: white;
 		background-color: #67000c;
 	}
+
+	// Hiding arrows from number text-field
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	// in Firefox
+	input[type="number"] {
+		-moz-appearance: textfield;
+	}
 }
 
 ::-webkit-scrollbar {
@@ -54,98 +66,6 @@ body {
 	background: #ccc;
 }
 
-.container {
-	margin: 0;
-	overflow: hidden;
-}
-
-.pointer {
-	cursor: pointer;
-}
-
-.h {
-	&-screen {
-		height: calc(100vh - 94px);
-	}
-	&-full {
-		height: 100%;
-	}
-
-	&-login {
-		height: calc(100vh - 47px);
-	}
-}
-
-// .flex {
-// 	display: flex;
-
-// 	&-column {
-// 		flex-direction: column;
-// 	}
-
-// 	&-grow {
-// 		flex-grow: 1;
-// 	}
-// }
-
-// .gap {
-// 	&-1 {
-// 		gap: 4px;
-// 	}
-// 	&-2 {
-// 		gap: 8px;
-// 	}
-// 	&-3 {
-// 		gap: 16px;
-// 	}
-// }
-
-// .align {
-// 	&-items-center {
-// 		align-items: center;
-// 	}
-// 	&-items-end {
-// 		align-items: flex-end;
-// 	}
-// 	&-items-start {
-// 		align-items: flex-start;
-// 	}
-// }
-
-.text {
-	&-left {
-		text-align: left;
-	}
-	&-center {
-		text-align: center;
-	}
-	&-right {
-		text-align: right;
-	}
-	&-justify {
-		text-align: justify;
-	}
-}
-
-// .justify {
-// 	&-content-center {
-// 		justify-content: center;
-// 	}
-// 	&-content-between {
-// 		justify-content: space-between;
-// 	}
-// 	&-content-around {
-// 		justify-content: space-around;
-// 	}
-// 	&-content-end {
-// 		justify-content: flex-end;
-// 	}
-// }
-
-.w-min {
-	width: min-content;
-}
-
 .bg {
 	&-yellow {
 		background-color: $yellow;
@@ -153,13 +73,6 @@ body {
 	&-blue {
 		background-color: $blue;
 	}
-}
-
-.input {
-	border: unset;
-	padding: 1rem;
-	margin: 0.5rem;
-	border-radius: 4px;
 }
 
 .button {

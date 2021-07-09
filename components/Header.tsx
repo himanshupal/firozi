@@ -43,13 +43,13 @@ const Header = (): JSX.Element => {
 						name="search"
 						type="search"
 						placeholder="Search"
-						className="hidden md:block w-full px-2 h-8"
+						className="hidden md:block w-full px-2 h-8 text-blood"
 					/>
 					<input
 						name="location"
 						type="search"
 						placeholder="Location"
-						className="hidden md:block w-full px-2 h-8"
+						className="hidden md:block w-full px-2 h-8 text-blood"
 					/>
 					<img
 						className="rounded-full cursor-pointer"
