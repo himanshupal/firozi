@@ -207,9 +207,12 @@ const CreateAd = (): JSX.Element => {
 					<div
 						tabIndex={0}
 						onClick={() => setNegotiable((negotiable) => !negotiable)}
+						onKeyPress={(e) =>
+							e.code === "Space" && setNegotiable((negotiable) => !negotiable)
+						}
 						className={
 							negotiable
-								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer focus-visible:outline-none`
+								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer`
 								: `h-5 w-9 rounded-full mb-3 border-2 border-blood text-xs flex items-center justify-center text-blood cursor-pointer`
 						}
 					>
@@ -225,9 +228,13 @@ const CreateAd = (): JSX.Element => {
 					<div
 						tabIndex={0}
 						onClick={() => setOfflineOnly((offlineOnly) => !offlineOnly)}
+						onKeyPress={(e) =>
+							e.code === "Space" &&
+							setOfflineOnly((offlineOnly) => !offlineOnly)
+						}
 						className={
 							offlineOnly
-								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer focus-visible:outline-none`
+								? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer`
 								: `h-5 w-9 rounded-full mb-3 border-2 border-blood text-xs flex items-center justify-center text-blood cursor-pointer`
 						}
 					>
