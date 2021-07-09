@@ -1,16 +1,18 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 
-import { signIn, signOut, useSession } from "next-auth/client"
+import { signOut, useSession } from "next-auth/client"
 import { Fragment, useState } from "react"
 
 import Menu from "components/Menu"
+import Login from "components/Login"
 import routes from "data/navlinks"
 
 const Header = (): JSX.Element => {
 	const [session, loading] = useSession()
-	const [menu, setMenu] = useState(false)
-	const [hover, setHover] = useState(false)
+	const [menu, setMenu] = useState<Boolean>(false)
+	const [hover, setHover] = useState<Boolean>(false)
+	const [login, setLogin] = useState<Boolean>(false)
 
 	const router = useRouter()
 
@@ -37,14 +39,22 @@ const Header = (): JSX.Element => {
 					</Link>
 				</div>
 				<div className="flex items-center gap-5">
-					<input name="search" className="hidden md:block w-full px-2 h-8" />
-					<input name="location" className="hidden md:block w-full px-2 h-8" />
+					<input
+						name="search"
+						type="search"
+						placeholder="Search"
+						className="hidden md:block w-full px-2 h-8"
+					/>
+					<input
+						name="location"
+						type="search"
+						placeholder="Location"
+						className="hidden md:block w-full px-2 h-8"
+					/>
 					<img
 						className="rounded-full cursor-pointer"
 						src="/icons/profile.svg"
-						onClick={async () =>
-							session ? setHover((hover) => !hover) : await signIn()
-						}
+						onClick={() => setLogin((login) => !login)}
 					/>
 				</div>
 			</header>
@@ -69,6 +79,7 @@ const Header = (): JSX.Element => {
 			)}
 
 			{menu && <Menu />}
+			{login && <Login toggle={setLogin} />}
 		</Fragment>
 	)
 }
