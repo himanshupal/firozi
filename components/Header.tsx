@@ -19,7 +19,7 @@ const Header = (): JSX.Element => {
 	const routeMap = {
 		"/": "Firozi",
 		"/ad/create": "Create new Ad",
-		"/profile/edit": "Update profile details"
+		"/profile/edit": "Update profile"
 	}
 
 	const location = Object.keys(routeMap).includes(router.pathname)

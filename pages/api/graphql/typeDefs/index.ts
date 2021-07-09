@@ -1,7 +1,45 @@
-import { readFileSync } from "fs";
+import { gql } from "apollo-server-micro"
+import { DocumentNode } from "graphql"
 
-const user: string = readFileSync(__dirname + "/user.gql", { encoding: "utf-8" })
-const ad: string = readFileSync(__dirname + "/ad.gql", { encoding: "utf-8" })
-const query: string = readFileSync("./query.gql", { encoding: "utf-8" })
+const definition: DocumentNode = gql`
+	type Ad {
+		_id: ID
+		title: String!
+		description: String
+		category: String!
+		images: [String!]!
+		price: Float!
+		discount: Float
+		discountTill: Float
+		usedFor: String
+		condition: String!
+		shippingHandler: String
+		pfAvailable: Boolean
+		workingHours: Int!
+		offlineOnly: Boolean
+		location: String!
+		createdAt: String!
+		createdBy: User!
+	}
 
-export default [user, ad, query]
+	type User {
+		_id: ID!
+		name: String!
+		email: String!
+		avatar: String
+		contact: Float
+		username: String
+		password: String
+		private: Boolean
+		ads: [Ad]
+		saved: [Ad]
+		follows: [User]
+		createdAt: String!
+		lastOnline: String!
+	}
+
+	type Query {
+		user(name: String): User
+	}
+`
+export default [definition]

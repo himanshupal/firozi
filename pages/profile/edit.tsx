@@ -25,7 +25,7 @@ const EditUser = (): JSX.Element => {
 	return (
 		<Fragment>
 			<Head>
-				<title>Firozi | Create Ad</title>
+				<title>Firozi | Edit Profile</title>
 			</Head>
 
 			<div className="flex justify-center">

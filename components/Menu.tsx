@@ -1,6 +1,7 @@
 import { Range } from "rc-slider"
-import "rc-slider/assets/index.css"
 import { useState } from "react"
+
+import "rc-slider/assets/index.css"
 
 const Menu = (): JSX.Element => {
 	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })

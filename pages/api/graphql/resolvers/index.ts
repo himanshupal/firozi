@@ -1,7 +1,9 @@
-import { Resolvers } from "@apollo/client";
+import { IResolvers } from "apollo-server-micro"
 
-export const resolvers: Resolvers = {
-  Query: {
-    user: (_, { name }) => name
-  }
+const resolution: IResolvers = {
+	Query: {
+		user: (_, { name }) => ({ name })
+	}
 }
+
+export default [resolution]

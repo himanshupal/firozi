@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Dispatch, SetStateAction } from "react"
-import Modal from "./Modal"
+import Modal from "components/Modal"
 
 interface LoginProps {
 	toggle: Dispatch<SetStateAction<Boolean>>

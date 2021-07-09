@@ -1,21 +1,7 @@
-@import "./login.module.scss";
-@import "./layout.module.scss";
-@import "./categoryfilter.module.scss";
-@import "./slider.module.scss";
-
-@import "./variables";
-@import "./input";
-
-@import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Playball&family=Sen:wght@400;700;800&family=Srisakdi&display=swap");
-// @import "https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css";
+@import url("https://fonts.googleapis.com/css2?family=Playball&family=Sen:wght@400;700;800&display=swap");
 
 body {
 	margin: unset;
-
-	// * {
-	// 	font-family: "Viaoda Libre";
-	// }
 
 	textarea {
 		margin: unset;
@@ -39,7 +25,6 @@ body {
 	input::-webkit-outer-spin-button,
 	input::-webkit-inner-spin-button {
 		-webkit-appearance: none;
-		margin: 0;
 	}
 
 	// in Firefox
@@ -64,44 +49,4 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
 	background: #ccc;
-}
-
-.bg {
-	&-yellow {
-		background-color: $yellow;
-	}
-	&-blue {
-		background-color: $blue;
-	}
-}
-
-.button {
-	background: none;
-	cursor: pointer;
-
-	color: $yellow;
-	background: $blue;
-
-	padding: 0.5rem;
-	font-size: 20px;
-
-	border-radius: 8px;
-	border: 2px solid $yellow;
-
-	filter: drop-shadow(4px 4px 0 #000);
-
-	&:hover {
-		filter: drop-shadow(3px 3px 0 #000);
-	}
-}
-
-.card {
-	font-size: 20px;
-	margin: 0 auto;
-	width: 75%;
-
-	&__icon {
-		color: $blue;
-		background: $yellow;
-	}
 }
