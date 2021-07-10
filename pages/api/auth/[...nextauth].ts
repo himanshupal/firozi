@@ -1,8 +1,6 @@
 import { NextApiHandler } from "next"
-import { PrismaClient } from "@prisma/client"
 
 import NextAuth, { NextAuthOptions } from "next-auth"
-import Adapters from "next-auth/adapters"
 import Providers from "next-auth/providers"
 
 const options: NextAuthOptions = {
@@ -38,11 +36,11 @@ const options: NextAuthOptions = {
 		})
 	],
 	session: {
-		maxAge: 30 * 24 * 60 * 60
+		maxAge: 3 * 24 * 60 * 60
 	},
 	secret: process.env.AUTH_SECRET,
-	database: process.env.MONGO_URI
-	// adapter: Adapters.Prisma.Adapter({ prisma: new PrismaClient() })
+	database: process.env.MONGO_URI,
+	debug: process.env.NODE_ENV === "development"
 }
 
 const authHandler: NextApiHandler = async (req, res) => {

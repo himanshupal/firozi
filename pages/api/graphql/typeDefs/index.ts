@@ -42,4 +42,7 @@ const definition: DocumentNode = gql`
 		user(name: String): User
 	}
 `
-export default [definition]
+
+const typeDefs: Array<DocumentNode> = [definition]
+
+export default typeDefs

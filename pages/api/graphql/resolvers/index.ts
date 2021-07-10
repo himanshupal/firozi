@@ -6,4 +6,6 @@ const resolution: IResolvers = {
 	}
 }
 
-export default [resolution]
+const resolvers: Array<IResolvers> = [resolution]
+
+export default resolvers

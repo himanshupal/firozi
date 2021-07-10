@@ -34,6 +34,7 @@ const EditUser = (): JSX.Element => {
 						<div className="flex relative justify-center">
 							{image && (
 								<img
+									alt="Close Icon"
 									src="/icons/cancel.svg"
 									onClick={() => setImage("")}
 									className="absolute w-6 h-6 rounded-full bg-blood p-1 cursor-pointer left-0 sm:left-1/4"
@@ -48,6 +49,7 @@ const EditUser = (): JSX.Element => {
 								onClick={() => (image ? null : imageInputRef.current.click())}
 							>
 								<img
+									alt={image ? `User Avatar` : `Plus Icon`}
 									src={image ? (image as string) : `/icons/plus-lg.svg`}
 									className={image ? "w-full h-full object-cover" : "mb-2"}
 								/>

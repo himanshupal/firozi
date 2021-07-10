@@ -32,23 +32,24 @@ const CreateAd = (): JSX.Element => {
 
 			<div className="flex">
 				<div className="flex flex-col w-2/3 flex-grow p-3">
-					<div className="flex gap-4 items-center mb-3 pb-2 overflow-auto">
+					<div className="flex gap-3 items-center mb-3 pb-2 overflow-auto">
 						{images.map((image, index) => (
 							<img
-								className="w-36 object-contain rounded-lg cursor-not-allowed"
+								className="h-28 object-contain rounded-lg cursor-not-allowed"
 								onClick={() =>
 									setImages(images.filter((current) => current !== image))
 								}
 								src={image as string}
+								alt={`image-${index}`}
 								key={index}
 							/>
 						))}
 
 						<div
-							className="border-2 border-blood rounded-md shadow-md drop-shadow-md p-4 w-max text-xs text-gray-400 flex flex-col items-center text-center cursor-pointer"
+							className="border-2 border-blood rounded-md shadow-md drop-shadow-md p-4 h-28 w-max text-xs text-gray-400 flex flex-col items-center justify-around text-center cursor-pointer"
 							onClick={() => imageInputRef.current.click()}
 						>
-							<img src="/icons/plus-lg.svg" className="mb-2" />
+							<img src="/icons/plus-lg.svg" className="mb-2" alt="Plus Icon" />
 							Add Image
 						</div>
 

@@ -11,6 +11,7 @@ const Modal = ({ title, toggle, children }: ModalProps): JSX.Element => {
 		<div className="fixed top-0 h-screen w-screen bg-blood bg-opacity-90 z-50 flex flex-col items-center">
 			<img
 				className="absolute top-2.5 right-3 cursor-pointer"
+				alt="Close Icon"
 				src="/icons/cancel.svg"
 				onClick={() => toggle((state) => !state)}
 			/>

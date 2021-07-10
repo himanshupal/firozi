@@ -5,8 +5,8 @@ import resolvers from "./resolvers/index"
 const server: ApolloServer = new ApolloServer({
 	typeDefs,
 	resolvers,
-	tracing: true,
-	playground: true
+	tracing: process.env.NODE_ENV === "development",
+	playground: process.env.NODE_ENV === "development"
 })
 
 export default server.createHandler({ path: "/api/graphql" })

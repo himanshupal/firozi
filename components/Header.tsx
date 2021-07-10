@@ -32,10 +32,11 @@ const Header = (): JSX.Element => {
 				<div className="flex gap-3 font-cursive">
 					<img
 						className="cursor-pointer"
+						alt="Close Icon"
 						src={menu ? `/icons/cancel.svg` : `/icons/menu.svg`}
 						onClick={() => setMenu((menu) => !menu)}
 					/>
-					<Link href="/">
+					<Link href="/" passHref>
 						<span className="cursor-pointer text-3xl">{location}</span>
 					</Link>
 				</div>
@@ -54,19 +55,24 @@ const Header = (): JSX.Element => {
 					/>
 					<img
 						className="rounded-full cursor-pointer"
+						alt="Profile Icon"
 						src="/icons/profile.svg"
-						onClick={() => setLogin((login) => !login)}
+						onClick={() =>
+							session
+								? setHover((hover) => !hover)
+								: setLogin((login) => !login)
+						}
 					/>
 				</div>
 			</header>
 
 			{hover && !loading && session && (
 				<div className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 m-2">
-					<Link href={`/profile/${session?.user?.email}`}>
+					<Link href={`/profile/${session?.user?.email}`} passHref>
 						<div className="cursor-pointer my-1 px-6">Profile</div>
 					</Link>
 					{routes.map(({ path, text }, index) => (
-						<Link href={path} key={index}>
+						<Link href={path} key={index} passHref>
 							<div className="cursor-pointer my-1 px-6">{text}</div>
 						</Link>
 					))}
