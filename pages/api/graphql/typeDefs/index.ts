@@ -1,48 +1,17 @@
 import { gql } from "apollo-server-micro"
 import { DocumentNode } from "graphql"
 
-const definition: DocumentNode = gql`
-	type Ad {
-		_id: ID
-		title: String!
-		description: String
-		category: String!
-		images: [String!]!
-		price: Float!
-		discount: Float
-		discountTill: Float
-		usedFor: String
-		condition: String!
-		shippingHandler: String
-		pfAvailable: Boolean
-		workingHours: Int!
-		offlineOnly: Boolean
-		location: String!
-		createdAt: String!
-		createdBy: User!
-	}
+import { User } from "./user"
+import { Ad } from "./ad"
 
-	type User {
-		_id: ID!
-		name: String!
-		email: String!
-		avatar: String
-		contact: Float
-		username: String
-		password: String
-		private: Boolean
-		ads: [Ad]
-		saved: [Ad]
-		follows: [User]
-		createdAt: String!
-		lastOnline: String!
-	}
-
+const Query: DocumentNode = gql`
 	type Query {
-		user(name: String): User
+		user(username: String, email: String): User
+		ads(skip: Int, limit: Int): [Ad]
+		ad(slug: String): Ad
 	}
 `
 
-const typeDefs: Array<DocumentNode> = [definition]
+const typeDefs: Array<DocumentNode> = [Query, User, Ad]
 
 export default typeDefs

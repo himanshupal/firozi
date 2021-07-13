@@ -5,6 +5,7 @@ import resolvers from "./resolvers/index"
 const server: ApolloServer = new ApolloServer({
 	typeDefs,
 	resolvers,
+	context: (ctx) => ctx.req,
 	tracing: process.env.NODE_ENV === "development",
 	playground: process.env.NODE_ENV === "development"
 })

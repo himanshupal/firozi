@@ -9,9 +9,7 @@
 		"dev": "next dev",
 		"lint": "next lint",
 		"start": "next start",
-		"build": "next build",
-		"db_push": "npx prisma db push",
-		"generate": "npx prisma generate"
+		"build": "next build"
 	},
 	"dependencies": {
 		"@apollo/client": "^3.3.20",

@@ -1,8 +1,17 @@
 import { IResolvers } from "apollo-server-micro"
 
+import user from "./user"
+import ads from "./ads"
+import ad from "./ad"
+
 const resolution: IResolvers = {
 	Query: {
-		user: (_, { name }) => ({ name })
+		user,
+		ads,
+		ad
+	},
+	User: {
+		ads
 	}
 }
 

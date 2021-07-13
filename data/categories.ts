@@ -1,8 +1,4 @@
-interface Category {
-	_id: string
-	name: string
-	children?: Array<Category>
-}
+import { Category } from "models/Category"
 
 const categories: Array<Category> = [
 	{
