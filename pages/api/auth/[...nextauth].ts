@@ -1,7 +1,12 @@
+import { Session } from "models/Session"
+import { User } from "models/User"
 import { NextApiHandler } from "next"
 
 import NextAuth, { NextAuthOptions } from "next-auth"
+import { session } from "next-auth/client"
 import Providers from "next-auth/providers"
+
+import adapter from "./adapter"
 
 const options: NextAuthOptions = {
 	providers: [
@@ -39,8 +44,10 @@ const options: NextAuthOptions = {
 		maxAge: 3 * 24 * 60 * 60
 	},
 	secret: process.env.AUTH_SECRET,
-	database: process.env.MONGO_URI,
-	debug: process.env.NODE_ENV === "development"
+	// database: process.env.MONGO_URI,
+	adapter,
+	database: "mongodb://localhost/test"
+	// debug: process.env.NODE_ENV === "development"
 }
 
 const authHandler: NextApiHandler = async (req, res) => {

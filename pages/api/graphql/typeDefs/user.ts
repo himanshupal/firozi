@@ -4,8 +4,8 @@ import { DocumentNode } from "graphql"
 export const User: DocumentNode = gql`
 	type User {
 		_id: ID
-		name: String!
-		email: String
+		name: String
+		email: String!
 		avatar: String
 		contact: String
 		username: String
