@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Link from "next/link"
 import { useRouter } from "next/router"
 
@@ -67,8 +69,8 @@ const Header = (): JSX.Element => {
 			</header>
 
 			{hover && !loading && session && (
-				<div className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 m-2">
-					<Link href={`/profile/${session?.user?.email}`} passHref>
+				<div className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 m-2 z-10">
+					<Link href={`/profile/${session?.user?.sub}`} passHref>
 						<div className="cursor-pointer my-1 px-6">Profile</div>
 					</Link>
 					{routes.map(({ path, text }, index) => (

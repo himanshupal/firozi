@@ -8,9 +8,7 @@ export const User: DocumentNode = gql`
 		email: String
 		avatar: String
 		contact: String
-		username: String
-		password: String
-		private: Boolean
+		hidden: Boolean
 		ads(skip: Int, limit: Int): [Ad]
 		saved(skip: Int, limit: Int): [Ad]
 		follows(skip: Int, limit: Int): [User]

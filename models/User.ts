@@ -6,9 +6,7 @@ export interface User {
 	email?: string
 	avatar?: string
 	contact?: string
-	username?: string
-	password?: string
-	private?: Boolean
+	hidden?: Boolean
 	ads?: [Ad]
 	saved?: [Ad]
 	follows?: [User]

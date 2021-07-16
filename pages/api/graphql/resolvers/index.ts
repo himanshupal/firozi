@@ -4,6 +4,8 @@ import user from "./user"
 import ads from "./ads"
 import ad from "./ad"
 
+import updateUser from "./updateUser"
+
 const resolution: IResolvers = {
 	Query: {
 		user,
@@ -12,6 +14,9 @@ const resolution: IResolvers = {
 	},
 	User: {
 		ads
+	},
+	Mutation: {
+		updateUser
 	}
 }
 

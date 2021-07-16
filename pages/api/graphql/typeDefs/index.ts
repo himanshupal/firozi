@@ -6,9 +6,19 @@ import { Ad } from "./ad"
 
 const Query: DocumentNode = gql`
 	type Query {
-		user(username: String, email: String): User
+		user(_id: String, email: String): User
 		ads(skip: Int, limit: Int): [Ad]
 		ad(slug: String): Ad
+	}
+	type Mutation {
+		updateUser(
+			id: ID
+			name: String
+			email: String
+			avatar: String
+			contact: String
+			hidden: Boolean
+		): Boolean
 	}
 `
 

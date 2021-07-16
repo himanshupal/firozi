@@ -1,7 +1,11 @@
 import { NextApiHandler } from "next"
 
-import NextAuth, { NextAuthOptions } from "next-auth"
+import NextAuth, { NextAuthOptions, Profile, Session } from "next-auth"
 import Providers from "next-auth/providers"
+
+interface UserSession extends Session {
+	sub?: string
+}
 
 const options: NextAuthOptions = {
 	providers: [
@@ -36,11 +40,18 @@ const options: NextAuthOptions = {
 		})
 	],
 	session: {
+		jwt: true,
 		maxAge: 3 * 24 * 60 * 60
 	},
 	secret: process.env.AUTH_SECRET,
 	database: process.env.MONGO_URI,
-	debug: process.env.NODE_ENV === "development"
+	debug: process.env.NODE_ENV === "development",
+	callbacks: {
+		session: async (session: UserSession, user: Profile) => {
+			session.user = user
+			return session
+		}
+	}
 }
 
 const authHandler: NextApiHandler = async (req, res) => {

@@ -1,13 +1,10 @@
 import { MongoClient, Collection } from "mongodb"
 
 export const getClient = async (URI?: string): Promise<MongoClient> => {
-	const client: MongoClient = new MongoClient(
-		process.env.MONGO_URI || URI || "mongodb://localhost/firozi",
-		{
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		}
-	)
+	const client: MongoClient = new MongoClient(URI || process.env.MONGO_URI, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	})
 	return await client.connect()
 }
 

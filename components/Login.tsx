@@ -13,41 +13,6 @@ const Login = ({ toggle }: LoginProps): JSX.Element => {
 
 	return (
 		<Modal title="Login" toggle={toggle}>
-			<form
-				onSubmit={async (e) => {
-					e.preventDefault()
-					await signIn("email", { email: email.current.value })
-				}}
-			>
-				<label className="block pl-2 text-xl text-blood" htmlFor="email">
-					Email Address
-				</label>
-				<input
-					ref={email}
-					className="h-8 mb-1 px-2 border-2 border-blood focus-visible:outline-none"
-					type="email"
-				/>
-				<label className="block pl-2 text-xl text-blood" htmlFor="password">
-					Password
-				</label>
-				<input
-					ref={password}
-					className="h-8 mb-3 px-2 border-2 border-blood focus-visible:outline-none"
-					type="password"
-				/>
-				<button
-					type="submit"
-					className="h-9 bg-blood border-2 border-white shadow-md drop-shadow-md rounded-md text-white block px-4 mx-auto"
-				>
-					Continue
-				</button>
-			</form>
-			<div className="text-center text-xs py-1">
-				Forgot password?
-				<Link href="/recover"> Click here</Link>
-				<br />
-				or login using
-			</div>
 			<div className="flex gap-2 justify-around">
 				<img
 					tabIndex={0}
@@ -92,9 +57,27 @@ const Login = ({ toggle }: LoginProps): JSX.Element => {
 					onClick={() => signIn("zoom")}
 				/>
 			</div>
-			<div className="text-center text-xs py-1">
-				Don&apos;t have an account?<Link href="/recover"> Signup here</Link>
-			</div>
+			<form
+				onSubmit={async (e) => {
+					e.preventDefault()
+					await signIn("email", { email: email.current.value })
+				}}
+			>
+				<input
+					ref={email}
+					aria-label="Email Address"
+					placeholder="Enter your email address"
+					className="h-8 my-2 px-2 border-2 border-blood focus-visible:outline-none"
+					type="email"
+				/>
+
+				<button
+					type="submit"
+					className="h-9 bg-blood border-2 border-white shadow-md drop-shadow-md rounded-md text-white block px-4 mx-auto"
+				>
+					Login with Email
+				</button>
+			</form>
 		</Modal>
 	)
 }
