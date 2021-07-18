@@ -2,7 +2,11 @@ import { gql, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { useSession } from "next-auth/client"
 import Head from "next/head"
-import { Fragment, useState, useRef } from "react"
+import { Fragment, useState, useRef, useEffect } from "react"
+
+import Modal from "components/Modal"
+import { toast } from "react-toastify"
+import { NextPageContext } from "next"
 
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
@@ -48,7 +52,7 @@ const CREATE_AD = gql`
 	}
 `
 
-const CreateAd = (): JSX.Element => {
+const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [images, setImages] = useState<Array<string | ArrayBuffer>>([])
 	const [list, setList] = useState<string>("")
 
@@ -67,7 +71,12 @@ const CreateAd = (): JSX.Element => {
 	const [condition, setCondition] = useState<Condition>("Used")
 	const [handler, setHandler] = useState<Handler>("Buyer")
 
+	const [modal, setModal] = useState<Boolean>(false)
+	const [message, setMessage] = useState<string>("")
+
 	const imageInputRef = useRef<HTMLInputElement>()
+
+	const [userId, setUserId] = useState<string>("")
 
 	const [session, loading] = useSession()
 
@@ -88,31 +97,48 @@ const CreateAd = (): JSX.Element => {
 
 	const [uploadAd, { loading: uploadingAd }] = useMutation(CREATE_AD)
 
+	useEffect(() => {
+		if (loading) setMessage("Fetching Session...")
+		if (uploadingAd) setMessage("Saving Data...")
+
+		// @ts-ignore
+		if (session) setUserId(session?.user?.sub)
+
+		if (loading || uploadingAd) setModal(true)
+		else setModal(false)
+	}, [loading, uploadingAd])
+
 	const createAd = async (published) => {
-		console.log({
-			title,
-			description,
-			category,
-			location,
-			price,
-			usedFor,
-			workingHours,
-			workingPeriod,
-			salaryPeriod,
-			adtype,
-			negotiable,
-			offlineOnly,
-			condition,
-			handler,
-			published
-		})
+		let imageLinks = new Array<string>()
+
+		if (images.length) {
+			setMessage("Uploading Images...")
+			setModal(true)
+
+			imageLinks = await Promise.all(
+				images.map(async (image) => {
+					const body = new FormData()
+					body.append("file", image.toString())
+					body.append("upload_preset", cloudinarySecret)
+					body.append("tags", `firozi, ads_images, ${adtype}, ${userId}`)
+
+					const res = await fetch(cloudinaryUrl, {
+						method: "POST",
+						body
+					})
+
+					const { url } = await res.json()
+					return url
+				})
+			)
+		}
 
 		const { data, errors } = await uploadAd({
 			variables: filter({
 				title,
 				description,
 				category,
-				images,
+				images: imageLinks,
 				location,
 				price: Number(price),
 				usedFor,
@@ -126,21 +152,22 @@ const CreateAd = (): JSX.Element => {
 				shippingBy: handler,
 				published,
 				// @ts-ignore
-				createdBy: session?.user?.sub
+				createdBy: userId
 			})
 		})
 
 		if (errors) console.log(errors.map((x) => x.message))
-		console.log(data)
-	}
 
-	if (loading) return <div>Loading...</div>
+		if (data.createAd) toast.success("Ad Created !")
+	}
 
 	return (
 		<Fragment>
 			<Head>
 				<title>Firozi | Create Ad</title>
 			</Head>
+
+			{modal && <Modal title={message} toggle={setModal} fixed />}
 
 			<div className="flex justify-around">
 				<form
@@ -355,7 +382,7 @@ const CreateAd = (): JSX.Element => {
 								<input
 									type="number"
 									min="0"
-									max="250"
+									max={1e3}
 									name="workingHours"
 									value={workingHours}
 									onFocus={() => setList("")}
@@ -389,6 +416,7 @@ const CreateAd = (): JSX.Element => {
 						<input
 							type="number"
 							min="0"
+							max={9e6} // Design fix
 							name="price"
 							value={price}
 							onFocus={() => setList("")}
@@ -575,3 +603,10 @@ const CreateAd = (): JSX.Element => {
 }
 
 export default CreateAd
+
+export const getStaticProps = (context: NextPageContext) => ({
+	props: {
+		cloudinaryUrl: process.env.CLOUDINARY_URL,
+		cloudinarySecret: process.env.CLOUDINARY_SECRET
+	}
+})

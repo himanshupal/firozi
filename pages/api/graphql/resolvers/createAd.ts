@@ -53,7 +53,9 @@ const createAd = async (
 		slug:
 			title &&
 			encodeURI(
-				title?.replace(/\s+/g, "-")?.slice(0, 50)?.toLowerCase() + Date.now()
+				title?.replace(/\s+/g, "-")?.slice(0, 50)?.toLowerCase() +
+					"-" +
+					Date.now()
 			)
 	})
 
