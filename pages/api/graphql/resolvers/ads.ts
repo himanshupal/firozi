@@ -14,7 +14,7 @@ const getAds = async (
 	const adsCollection: Collection<Ad> = getCollection<Ad>("ads", client)
 
 	const adsCursor: Cursor<Ad> = adsCollection
-		.find(user && { createdBy: { _id: user?._id.toString() } })
+		.find(user && { createdBy: { _id: user?._id } })
 		.limit(limit)
 		.skip(skip)
 

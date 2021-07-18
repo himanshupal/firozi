@@ -4,21 +4,24 @@ import { DocumentNode } from "graphql"
 export const Ad: DocumentNode = gql`
 	type Ad {
 		_id: ID
-		title: String!
-		slug: String!
+		title: String
+		slug: String
 		description: String
-		category: ID
-		images: [String!]!
-		price: Float!
+		category: String
+		images: [String]
+		price: Float
+		adtype: String
 		usedFor: String
 		condition: String
 		shippingBy: String
 		negotiable: Boolean
 		workingHours: String
 		offlineOnly: Boolean
-		location: String!
-		createdAt: String!
-		updatedAt: String!
-		createdBy: User!
+		workingPeriod: String
+		salaryPeriod: String
+		location: String
+		createdAt: String
+		updatedAt: String
+		createdBy: User
 	}
 `

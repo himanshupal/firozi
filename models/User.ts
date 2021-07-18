@@ -1,7 +1,8 @@
 import { Ad } from "models/Ad"
+import { ObjectId } from "mongodb"
 
 export interface User {
-	_id?: string
+	_id?: ObjectId
 	name?: string
 	email?: string
 	avatar?: string

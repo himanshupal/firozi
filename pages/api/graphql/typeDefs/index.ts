@@ -20,6 +20,25 @@ const Query: DocumentNode = gql`
 			hidden: Boolean
 			location: String
 		): Boolean
+
+		createAd(
+			title: String
+			description: String
+			category: String
+			images: [String]
+			price: Float
+			adtype: String
+			usedFor: String
+			condition: String
+			shippingBy: String
+			negotiable: Boolean
+			workingHours: String
+			workingPeriod: String
+			salaryPeriod: String
+			offlineOnly: Boolean
+			location: String
+			createdBy: String
+		): Boolean
 	}
 `
 

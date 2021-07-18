@@ -12,7 +12,6 @@ const updateUser = async (
 	const usersCollection: Collection<User> = getCollection<User>("users", client)
 
 	const { modifiedCount } = await usersCollection.updateOne(
-		// @ts-ignore
 		{ _id: new ObjectId(id) },
 		{
 			$set: {

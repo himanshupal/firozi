@@ -292,8 +292,8 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 								}
 								className={
 									privateUser
-										? `h-5 w-9 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer`
-										: `h-5 w-9 rounded-full mb-3 border-2 border-blood text-xs flex items-center justify-center text-blood cursor-pointer`
+										? `h-8 w-20 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer`
+										: `h-8 w-20 rounded-full mb-3 border-2 border-blood text-xs flex items-center justify-center text-blood cursor-pointer`
 								}
 							>
 								{privateUser ? "Yes" : "No"}
