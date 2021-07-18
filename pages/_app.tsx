@@ -7,9 +7,12 @@ import client from "helpers/apolloclient"
 import Header from "components/Header"
 import Footer from "components/Footer"
 
+import { ToastContainer } from "react-toastify"
+
 import "styles/site.scss"
 import "swiper/swiper.scss"
 import "tailwindcss/tailwind.css"
+import "react-toastify/dist/ReactToastify.css"
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 	return (
@@ -21,6 +24,8 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 					<Component {...pageProps} />
 					<Footer />
 				</main>
+
+				<ToastContainer />
 			</ApolloProvider>
 		</Provider>
 	)

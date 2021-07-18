@@ -7,6 +7,7 @@ const server: ApolloServer = new ApolloServer({
 	resolvers,
 	context: (ctx) => {
 		if (ctx.req.headers.authorization !== process.env.CLIENT_ID) {
+			console.error("AUTH ERR !")
 			throw new AuthenticationError("Unauthorized request!")
 		}
 		return ctx.req

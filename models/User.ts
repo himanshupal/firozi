@@ -7,6 +7,7 @@ export interface User {
 	avatar?: string
 	contact?: string
 	hidden?: Boolean
+	location?: string
 	ads?: [Ad]
 	saved?: [Ad]
 	follows?: [User]

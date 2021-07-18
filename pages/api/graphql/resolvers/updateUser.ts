@@ -5,7 +5,7 @@ import { User } from "models/User"
 
 const updateUser = async (
 	_,
-	{ id, email, avatar, contact, hidden, name }
+	{ id, email, avatar, contact, hidden, name, location }
 ): Promise<Boolean> => {
 	const client: MongoClient = await getClient()
 
@@ -20,7 +20,8 @@ const updateUser = async (
 				email,
 				avatar,
 				contact,
-				hidden
+				hidden,
+				location
 			}
 		}
 	)

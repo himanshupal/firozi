@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Collection, MongoClient, ObjectId } from "mongodb"
 
 import { getCollection, getClient } from "helpers/dbclient"
@@ -9,7 +11,7 @@ const getUser = async (_, { _id, email }: User): Promise<User> => {
 	const usersCollection: Collection<User> = getCollection<User>("users", client)
 
 	const user: User = await usersCollection.findOne({
-		$or: [{ _id: new ObjectId(_id).toHexString() }, { email }]
+		$or: [{ _id: new ObjectId(_id) }, { email }]
 	})
 
 	await client.close()

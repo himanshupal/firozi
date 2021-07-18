@@ -4,16 +4,17 @@ import { DocumentNode } from "graphql"
 export const User: DocumentNode = gql`
 	type User {
 		_id: ID
-		name: String!
+		name: String
 		email: String
 		avatar: String
 		contact: String
 		hidden: Boolean
+		location: String
 		ads(skip: Int, limit: Int): [Ad]
 		saved(skip: Int, limit: Int): [Ad]
 		follows(skip: Int, limit: Int): [User]
 		createdAt: String!
 		updatedAt: String!
-		lastOnline: String!
+		lastOnline: String
 	}
 `

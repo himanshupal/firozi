@@ -4,11 +4,26 @@ import Head from "next/head"
 import { NextPageContext } from "next"
 
 import { useSession } from "next-auth/client"
-import { Fragment, useState, useRef } from "react"
-import { gql, useQuery, useMutation } from "@apollo/client"
+import { Fragment, useState, useRef, useEffect } from "react"
+import { gql, useMutation, useLazyQuery } from "@apollo/client"
+import { filter } from "helpers/filter"
+import { toast } from "react-toastify"
 
 const nameRegex = /[\sa-zA-Z]+/
 const contactRegex = /[\+\-0-9]+/
+
+const USER_DETAILS = gql`
+	query getUser($id: String!) {
+		user(_id: $id) {
+			name
+			email
+			avatar
+			contact
+			location
+			hidden
+		}
+	}
+`
 
 const UPDATE_USER = gql`
 	mutation (
@@ -18,6 +33,7 @@ const UPDATE_USER = gql`
 		$avatar: String
 		$contact: String
 		$hidden: Boolean
+		$location: String
 	) {
 		updateUser(
 			id: $id
@@ -26,6 +42,7 @@ const UPDATE_USER = gql`
 			avatar: $avatar
 			hidden: $hidden
 			contact: $contact
+			location: $location
 		)
 	}
 `
@@ -47,6 +64,9 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 	const [updateUser, { loading: updating }] = useMutation(UPDATE_USER)
 
+	const [getUser, { data, loading: fetchingUser, error }] =
+		useLazyQuery(USER_DETAILS)
+
 	const imageSelected = (e) => {
 		const files: FileList = e.target.files
 
@@ -57,10 +77,23 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		}
 	}
 
+	useEffect(() => {
+		if (session && !data) getUser({ variables: { id: session?.user?.sub } })
+
+		if (data?.user) {
+			setName(data?.user?.name)
+			setEmail(data?.user?.email)
+			setImage(data?.user?.avatar)
+			setContact(data?.user?.contact)
+			setLocation(data?.user?.location)
+			setPrivateUser(data?.user?.hidden)
+		}
+	}, [session, data])
+
 	const updateProfile = async () => {
 		let avatar
 
-		if (image !== "") {
+		if (image) {
 			const body = new FormData()
 			body.append("file", image.toString())
 			body.append("upload_preset", cloudinarySecret)
@@ -76,7 +109,7 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		}
 
 		const { data } = await updateUser({
-			variables: {
+			variables: filter({
 				id: session.user.sub,
 				name,
 				email,
@@ -84,10 +117,10 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 				location,
 				avatar,
 				hidden: privateUser
-			}
+			})
 		})
 
-		console.log(data?.updateUser)
+		if (data?.updateUser) toast.success("Profile Updated!")
 	}
 
 	return (
@@ -167,6 +200,7 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							<input
 								type="email"
 								name="email"
+								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								placeholder="Your primary email address"
 								className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
@@ -184,6 +218,7 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 								onKeyPress={(e) =>
 									!contactRegex.test(e.key) && e.preventDefault()
 								}
+								value={contact}
 								onChange={(e) => setContact(e.target.value)}
 								onFocus={() => setList("")} // In case user is navigating through KBD & field is not accessible
 								placeholder="Your mobile number"

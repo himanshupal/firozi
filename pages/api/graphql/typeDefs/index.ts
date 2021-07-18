@@ -18,6 +18,7 @@ const Query: DocumentNode = gql`
 			avatar: String
 			contact: String
 			hidden: Boolean
+			location: String
 		): Boolean
 	}
 `

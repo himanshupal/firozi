@@ -1,57 +1,62 @@
+// @ts-nocheck
+
 import { useSession } from "next-auth/client"
 import { useRouter } from "next/router"
 import Link from "next/link"
-import { Swiper, SwiperSlide } from "swiper/react"
-import SwiperCore, { Keyboard, Navigation, Pagination } from "swiper"
-import "swiper/components/navigation/navigation.min.css"
-import "swiper/components/pagination/pagination.min.css"
+import { gql, useLazyQuery } from "@apollo/client"
+import UserProfile from "components/UserProfile"
+import { useEffect } from "react"
+
+import { toast } from "react-toastify"
+
+const USER_DETAILS = gql`
+	query getUser($id: String!) {
+		user(_id: $id) {
+			name
+			email
+			avatar
+			contact
+			location
+			hidden
+		}
+	}
+`
 
 const User = (): JSX.Element => {
 	const {
 		query: { user }
 	} = useRouter()
 
-	SwiperCore.use([Keyboard, Pagination, Navigation])
-
 	const [session, loading] = useSession()
 
-	if (loading) return <div>Loading...</div>
+	const [getUser, { data, loading: fetchingUser, error }] =
+		useLazyQuery(USER_DETAILS)
+
+	useEffect(() => {
+		if (session) getUser({ variables: { id: user || session?.user?.sub } })
+	}, [session])
+
+	if (loading) return <div>Fetching Session...</div>
+	if (fetchingUser) return <div>Fetching User...</div>
+
+	if (error) return <div>{error.message}</div>
 
 	return (
-		<Swiper
-			className="w-full h-full"
-			keyboard
-			pagination={{
-				dynamicBullets: true,
-				clickable: true
-			}}
-			navigation
-			hashNavigation={{ watchState: true }}
-		>
-			<SwiperSlide
-				className="flex flex-col overflow-auto px-14"
-				data-hash="about"
-			>
-				<div className="text-5xl font-bold py-2">About Me</div>
-				{session?.user?.name}
-
-				<div className="text-3xl">
-					<Link href="/profile/edit">Edit profile</Link>
-				</div>
-			</SwiperSlide>
-			<SwiperSlide
-				className="flex flex-col overflow-auto px-14"
-				data-hash="ads"
-			>
-				<div className="text-5xl font-bold py-2">My Ads</div>
-			</SwiperSlide>
-			<SwiperSlide
-				className="flex flex-col overflow-auto px-14"
-				data-hash="saved"
-			>
-				<div className="text-5xl font-bold py-2">Saved Ads</div>
-			</SwiperSlide>
-		</Swiper>
+		<div className="flex flex-col overflow-auto px-14">
+			<div className="text-5xl font-bold py-6 flex">
+				About Me
+				{user === session?.user?.sub && (
+					<Link href="/profile/edit" passHref>
+						<img
+							className="-translate-y-5 cursor-pointer"
+							src="/icons/edit.svg"
+							alt="Edit Icon"
+						/>
+					</Link>
+				)}
+			</div>
+			{data && <UserProfile userDetails={data?.user} />}
+		</div>
 	)
 }
 
