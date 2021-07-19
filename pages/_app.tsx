@@ -25,7 +25,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 					<Footer />
 				</main>
 
-				<ToastContainer />
+				<ToastContainer position="bottom-right" />
 			</ApolloProvider>
 		</Provider>
 	)

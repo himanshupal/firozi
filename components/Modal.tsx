@@ -2,7 +2,7 @@ import { Dispatch, ReactNode, SetStateAction } from "react"
 
 interface ModalProps {
 	title?: string
-	toggle: Dispatch<SetStateAction<Boolean>>
+	toggle?: Dispatch<SetStateAction<Boolean>>
 	children?: ReactNode
 	fixed?: boolean
 }

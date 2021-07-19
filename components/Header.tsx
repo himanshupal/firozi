@@ -4,17 +4,29 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 import { signOut, useSession } from "next-auth/client"
-import { Fragment, useState } from "react"
+import { gql, useLazyQuery } from "@apollo/client"
+import { Fragment, useEffect, useState } from "react"
 
 import Menu from "components/Menu"
 import Login from "components/Login"
 import routes from "data/navlinks"
+import Loading from "./Loading"
+import Modal from "./Modal"
+
+const GET_AVATAR = gql`
+	query getUser($id: String!) {
+		user(_id: $id) {
+			avatar
+		}
+	}
+`
 
 const Header = (): JSX.Element => {
 	const [session, loading] = useSession()
 	const [menu, setMenu] = useState<Boolean>(false)
 	const [hover, setHover] = useState<Boolean>(false)
 	const [login, setLogin] = useState<Boolean>(false)
+	const [avatar, setAvatar] = useState<string>("")
 
 	const router = useRouter()
 
@@ -27,6 +39,27 @@ const Header = (): JSX.Element => {
 	const location = Object.keys(routeMap).includes(router.pathname)
 		? routeMap[router.pathname]
 		: routeMap["/"]
+
+	const [getUser, { data, loading: fetchingUser, error }] =
+		useLazyQuery(GET_AVATAR)
+
+	useEffect(() => {
+		if (session && !data) getUser({ variables: { id: session?.user?.sub } })
+		if (data) {
+			if (data?.user?.avatar)
+				setAvatar(
+					data.user.avatar.replace(/upload/, "upload/c_limit,h_50,q_33,w_50")
+				)
+		}
+	}, [session, data])
+
+	if (fetchingUser) {
+		return <Loading message="Getting Profile Details" />
+	}
+
+	if (error) {
+		return <Modal title={error?.networkError?.name || error.message} fixed />
+	}
 
 	return (
 		<Fragment>
@@ -56,9 +89,15 @@ const Header = (): JSX.Element => {
 						className="hidden md:block w-full px-2 h-8 text-blood"
 					/>
 					<img
-						className="rounded-full cursor-pointer"
+						className={
+							avatar
+								? `rounded-full cursor-pointer border-2 border-white`
+								: `rounded-full cursor-pointer`
+						}
+						width="30"
+						height="30"
 						alt="Profile Icon"
-						src="/icons/profile.svg"
+						src={avatar || "/icons/profile.svg"}
 						onClick={() =>
 							session
 								? setHover((hover) => !hover)

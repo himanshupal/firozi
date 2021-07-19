@@ -1,13 +1,14 @@
 // @ts-nocheck
 
-import { useSession } from "next-auth/client"
-import { useRouter } from "next/router"
 import Link from "next/link"
-import { gql, useLazyQuery } from "@apollo/client"
+import Modal from "components/Modal"
+import Loading from "components/Loading"
 import UserProfile from "components/UserProfile"
-import { useEffect } from "react"
 
-import { toast } from "react-toastify"
+import { useEffect } from "react"
+import { useRouter } from "next/router"
+import { useSession } from "next-auth/client"
+import { gql, useLazyQuery } from "@apollo/client"
 
 const USER_DETAILS = gql`
 	query getUser($id: String!) {
@@ -36,10 +37,13 @@ const User = (): JSX.Element => {
 		if (session) getUser({ variables: { id: user || session?.user?.sub } })
 	}, [session])
 
-	if (loading) return <div>Fetching Session...</div>
-	if (fetchingUser) return <div>Fetching User...</div>
+	if (loading || fetchingUser) {
+		return <Loading />
+	}
 
-	if (error) return <div>{error.message}</div>
+	if (error) {
+		return <Modal title={error?.networkError?.name || error.message} fixed />
+	}
 
 	return (
 		<div className="flex flex-col overflow-auto px-14">
@@ -55,7 +59,7 @@ const User = (): JSX.Element => {
 					</Link>
 				)}
 			</div>
-			{data && <UserProfile userDetails={data?.user} />}
+			{data?.user && <UserProfile userDetails={data.user} />}
 		</div>
 	)
 }

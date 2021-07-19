@@ -8,6 +8,8 @@ import { Fragment, useState, useRef, useEffect } from "react"
 import { gql, useMutation, useLazyQuery } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { toast } from "react-toastify"
+import Loading from "components/Loading"
+import Modal from "components/Modal"
 
 const nameRegex = /[\sa-zA-Z]+/
 const contactRegex = /[\+\-0-9]+/
@@ -54,7 +56,8 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [image, setImage] = useState<string | ArrayBuffer>("")
 	const [list, setList] = useState<string>("")
 	const [location, setLocation] = useState<string>("")
-	const [imageUrl, setImageUrl] = useState<string>("")
+	const [toUpload, setToUpload] = useState<boolean>(false) // Will check if the image is uploaded now or is being used from state
+	const [uploadingImage, setUploadingImage] = useState<boolean>(false) // Will toggle as image upload starts & finishes
 
 	const imageInputRef = useRef<HTMLInputElement>()
 
@@ -62,7 +65,8 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [email, setEmail] = useState<string>("")
 	const [contact, setContact] = useState<string>("")
 
-	const [updateUser, { loading: updating }] = useMutation(UPDATE_USER)
+	const [updateUser, { loading: updating, error: updateError }] =
+		useMutation(UPDATE_USER)
 
 	const [getUser, { data, loading: fetchingUser, error }] =
 		useLazyQuery(USER_DETAILS)
@@ -75,6 +79,8 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 			reader.readAsDataURL(files.item(0))
 			reader.onloadend = (e) => setImage(e.target.result)
 		}
+
+		setToUpload(true)
 	}
 
 	useEffect(() => {
@@ -93,7 +99,9 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const updateProfile = async () => {
 		let avatar
 
-		if (image) {
+		if (image && toUpload) {
+			setUploadingImage(true)
+
 			const body = new FormData()
 			body.append("file", image.toString())
 			body.append("upload_preset", cloudinarySecret)
@@ -106,6 +114,10 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 			const { url } = await res.json()
 			avatar = url
+
+			setUploadingImage(false)
+		} else {
+			avatar = image
 		}
 
 		const { data } = await updateUser({
@@ -121,6 +133,26 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		})
 
 		if (data?.updateUser) toast.success("Profile Updated!")
+	}
+
+	if (loading) {
+		return <Loading />
+	}
+
+	if (fetchingUser) {
+		return <Loading message="Getting Profile Details" />
+	}
+
+	if (uploadingImage) {
+		return <Loading message="Uploading Image" />
+	}
+
+	if (updating) {
+		return <Loading message="Saving Profile" />
+	}
+
+	if (error || updateError) {
+		return <Modal title={error?.networkError?.name || error.message} fixed />
 	}
 
 	return (
