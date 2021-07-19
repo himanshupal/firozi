@@ -8,7 +8,7 @@ export interface Ad {
 	adtype?: string
 	description?: string
 	category?: string
-	images?: [string]
+	images?: Array<string>
 	price?: number
 	usedFor?: string
 	condition?: string
@@ -18,6 +18,7 @@ export interface Ad {
 	workingPeriod?: string
 	salaryPeriod?: string
 	offlineOnly?: Boolean
+	published?: string
 	location?: string
 	createdAt?: string
 	updatedAt?: string

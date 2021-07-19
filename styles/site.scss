@@ -50,3 +50,25 @@ body {
 ::-webkit-scrollbar-thumb:hover {
 	background: #ccc;
 }
+
+.bricks {
+	@media (min-width: 624px) {
+		columns: 2;
+	}
+
+	@media (min-width: 928px) {
+		columns: 3;
+	}
+
+	@media (min-width: 1232px) {
+		columns: 4;
+	}
+
+	@media (min-width: 1536px) {
+		columns: 5;
+	}
+
+	@media (min-width: 1840px) {
+		columns: 6;
+	}
+}
