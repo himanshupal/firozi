@@ -10,8 +10,6 @@ import { Fragment, useEffect, useState } from "react"
 import Menu from "components/Menu"
 import Login from "components/Login"
 import routes from "data/navlinks"
-import Loading from "./Loading"
-import Modal from "./Modal"
 
 const GET_AVATAR = gql`
 	query getUser($id: String!) {
@@ -40,8 +38,7 @@ const Header = (): JSX.Element => {
 		? routeMap[router.pathname]
 		: routeMap["/"]
 
-	const [getUser, { data, loading: fetchingUser, error }] =
-		useLazyQuery(GET_AVATAR)
+	const [getUser, { data }] = useLazyQuery(GET_AVATAR)
 
 	useEffect(() => {
 		if (session && !data) getUser({ variables: { id: session?.user?.sub } })
@@ -52,14 +49,6 @@ const Header = (): JSX.Element => {
 				)
 		}
 	}, [session, data])
-
-	if (fetchingUser) {
-		return <Loading message="Getting Profile Details" />
-	}
-
-	if (error) {
-		return <Modal title={error?.networkError?.name || error.message} fixed />
-	}
 
 	return (
 		<Fragment>

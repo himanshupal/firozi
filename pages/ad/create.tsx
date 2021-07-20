@@ -63,13 +63,14 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [price, setPrice] = useState<string>("")
 	const [usedFor, setUsedFor] = useState<string>("")
 	const [workingHours, setWorkingHours] = useState<string>("")
-	const [workingPeriod, setWorkingPeriod] = useState<string>("")
-	const [salaryPeriod, setSalaryPeriod] = useState<string>("")
+	const [workingPeriod, setWorkingPeriod] = useState<string>("Day")
+	const [salaryPeriod, setSalaryPeriod] = useState<string>("Month")
 	const [adtype, setAdtype] = useState<Ad>("Product")
 	const [negotiable, setNegotiable] = useState<Boolean>(false)
 	const [offlineOnly, setOfflineOnly] = useState<Boolean>(false)
 	const [condition, setCondition] = useState<Condition>("Used")
 	const [handler, setHandler] = useState<Handler>("Buyer")
+	const [published, setPublished] = useState<boolean>(true)
 
 	const [modal, setModal] = useState<Boolean>(false)
 	const [message, setMessage] = useState<string>("")
@@ -108,7 +109,12 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		else setModal(false)
 	}, [loading, uploadingAd])
 
-	const createAd = async (published) => {
+	const createAd = async () => {
+		if (!images.length) {
+			toast.error("A related image is required!")
+			return null
+		}
+
 		let imageLinks = new Array<string>()
 
 		if (images.length) {
@@ -143,14 +149,14 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 				price: Number(price),
 				usedFor,
 				workingHours,
-				workingPeriod,
-				salaryPeriod,
+				workingPeriod: adtype === "Product" ? "" : workingPeriod,
+				salaryPeriod: adtype === "Product" ? "" : salaryPeriod,
 				adtype,
 				negotiable,
 				offlineOnly,
-				condition,
-				shippingBy: handler,
-				published,
+				condition: adtype === "Job" ? "" : condition,
+				shippingBy: adtype === "Job" ? "" : handler,
+				published: published && new Date(),
 				// @ts-ignore
 				createdBy: userId
 			})
@@ -172,7 +178,10 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 			<div className="flex justify-around">
 				<form
 					className="flex flex-col sm:w-2/3 p-3"
-					onSubmit={(e) => e.preventDefault()}
+					onSubmit={(e) => {
+						e.preventDefault()
+						createAd()
+					}}
 				>
 					<div className="flex gap-3 items-center mb-3 pb-2 overflow-auto">
 						{images.map((image, index) => (
@@ -250,6 +259,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 						placeholder={
 							adtype === "Job" ? "Enter job title" : "Enter product name"
 						}
+						required
 						className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
 					/>
 
@@ -265,6 +275,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 						onFocus={() => setList("")}
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="Provide a detailed description"
+						required
 						className="border-blood border-2 mb-3 w-full px-2 h-20 focus-visible:outline-none text-gray-600"
 					/>
 
@@ -276,6 +287,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 					</label>
 					<span className="relative">
 						<input
+							required
 							type="search"
 							name="category"
 							autoComplete="off"
@@ -334,6 +346,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							value={location}
 							onChange={(e) => setLocation(e.target.value)}
 							placeholder="Select location for Ad"
+							required
 							className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
 						/>
 						<ul
@@ -384,6 +397,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 									min="0"
 									max={1e3}
 									name="workingHours"
+									required={adtype === "Job"}
 									value={workingHours}
 									onFocus={() => setList("")}
 									onChange={(e) => setWorkingHours(e.target.value)}
@@ -394,6 +408,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 								<select
 									name="workingPeriod"
 									value={workingPeriod}
+									required={adtype === "Job"}
 									onChange={(e) => setWorkingPeriod(e.target.value)}
 									className="flex-grow focus-visible:outline-none"
 								>
@@ -415,6 +430,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 						₹
 						<input
 							type="number"
+							required
 							min="0"
 							max={9e6} // Design fix
 							name="price"
@@ -430,6 +446,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 								<select
 									name="salaryPeriod"
 									value={salaryPeriod}
+									required={adtype === "Job"}
 									onChange={(e) => setSalaryPeriod(e.target.value)}
 									className="flex-grow focus-visible:outline-none"
 								>
@@ -577,7 +594,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 					<button
 						type="submit"
-						onClick={() => createAd(true)}
+						onClick={() => setPublished(true)}
 						className="h-9 bg-blood border-2 border-white shadow-md drop-shadow-md rounded-md text-white"
 					>
 						Publish Ad
@@ -585,7 +602,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 					<button
 						type="submit"
-						onClick={() => createAd(false)}
+						onClick={() => setPublished(false)}
 						className="text-blood text-sm text-center mt-2 font-semibold cursor-pointer"
 					>
 						Just save for now. I’ll publish it later.

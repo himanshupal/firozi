@@ -46,7 +46,7 @@ const AdCard = ({
 
 	return (
 		<div className="rounded-xl text-blood w-72 shadow-lg inline-block my-3 mx-3 text-left hover:shadow-2xl transition-all">
-			{images.map(
+			{images?.map(
 				(image, index) =>
 					index === 0 && (
 						<img
@@ -79,8 +79,8 @@ const AdCard = ({
 				</div>
 			</div>
 			<div className="py-1 px-3 text-sm leading-tight">
-				{description.length > 175
-					? description.slice(0, 175) + "..."
+				{description?.length > 175
+					? description?.slice(0, 175) + "..."
 					: description}
 			</div>
 			<div className="border-t-2 flex items-center justify-between py-1 px-3 text-sm">
