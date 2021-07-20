@@ -1,5 +1,5 @@
 import { User } from "models/User"
-
+import { useRouter } from "next/router"
 interface UserProfile {
 	userDetails: User
 }
@@ -13,6 +13,8 @@ const fields: Array<keyof User> = [
 ]
 
 const UserProfile = ({ userDetails }: UserProfile): JSX.Element => {
+	const router = useRouter()
+
 	return (
 		<>
 			{userDetails["avatar"] && (
@@ -23,7 +25,7 @@ const UserProfile = ({ userDetails }: UserProfile): JSX.Element => {
 				/>
 			)}
 
-			<div className="flex flex-col gap-4 py-6">
+			<div className="flex h-full flex-col gap-4 py-6">
 				{Object.keys(userDetails)
 					.filter((x: keyof User) => fields.includes(x))
 					.map((key, index) => (
@@ -43,6 +45,13 @@ const UserProfile = ({ userDetails }: UserProfile): JSX.Element => {
 							</div>
 						</div>
 					))}
+
+				<div
+					onClick={() => router.back()}
+					className="text-lg font-semibold text-right cursor-pointer border-t-2 border-blood min-w-min py-1"
+				>
+					Go back
+				</div>
 			</div>
 		</>
 	)

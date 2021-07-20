@@ -1,5 +1,6 @@
-import Link from "next/link"
 import { Ad } from "models/Ad"
+import { Dispatch, SetStateAction } from "react"
+import { NextRouter } from "next/router"
 
 const durationShort = (duration: string) => {
 	switch (duration) {
@@ -21,10 +22,16 @@ const durationShort = (duration: string) => {
 }
 
 type AdProps = {
+	loggedIn: boolean
+	router: NextRouter
+	loginToggle?: Dispatch<SetStateAction<boolean>>
 	details: Ad
 }
 
 const AdCard = ({
+	loggedIn,
+	router,
+	loginToggle,
 	details: {
 		title,
 		slug,
@@ -42,10 +49,10 @@ const AdCard = ({
 		offlineOnly
 	}
 }: AdProps) => {
-	console.log(images)
-
 	return (
 		<div className="rounded-xl text-blood w-72 shadow-lg inline-block my-3 mx-3 text-left hover:shadow-2xl transition-all">
+			<div className="absolute w-8 text-xs "></div>
+
 			{images?.map(
 				(image, index) =>
 					index === 0 && (
@@ -57,11 +64,14 @@ const AdCard = ({
 						/>
 					)
 			)}
-			<Link href={`/${slug}`} passHref>
-				<div className="text-3xl font-bold py-1 px-3 cursor-pointer">
-					{title}
-				</div>
-			</Link>
+			<div
+				onClick={() =>
+					loggedIn ? router.push(`/${slug}`) : loginToggle((login) => !login)
+				}
+				className="text-3xl font-bold py-1 px-3 cursor-pointer"
+			>
+				{title}
+			</div>
 			<div className="flex w-full items-center justify-between bg-gray-300 py-1 px-3">
 				<div className="text-2xl font-semibold flex items-center">
 					₹ {price}/-

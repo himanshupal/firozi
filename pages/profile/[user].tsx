@@ -46,7 +46,7 @@ const User = (): JSX.Element => {
 	}
 
 	return (
-		<div className="flex flex-col overflow-auto px-14">
+		<div className="flex flex-col justify-content items-center overflow-auto px-14">
 			<div className="text-5xl font-bold py-6 flex">
 				About Me
 				{user === session?.user?.sub && (

@@ -2,6 +2,7 @@
 
 import Head from "next/head"
 import { NextPageContext } from "next"
+import { useRouter } from "next/router"
 
 import { useSession } from "next-auth/client"
 import { Fragment, useState, useRef, useEffect } from "react"
@@ -10,6 +11,7 @@ import { filter } from "helpers/filter"
 import { toast } from "react-toastify"
 import Loading from "components/Loading"
 import Modal from "components/Modal"
+import router from "next/router"
 
 const nameRegex = /[\sa-zA-Z]+/
 const contactRegex = /[\+\-0-9]+/
@@ -51,6 +53,7 @@ const UPDATE_USER = gql`
 
 const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [session, loading] = useSession()
+	const router = useRouter()
 
 	const [privateUser, setPrivateUser] = useState<Boolean>(false)
 	const [image, setImage] = useState<string | ArrayBuffer>("")
@@ -337,6 +340,13 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							>
 								Update Profile
 							</button>
+
+							<div
+								onClick={() => router.back()}
+								className="text-sm text-center cursor-pointer pt-2"
+							>
+								Go back
+							</div>
 						</div>
 					</div>
 				</form>

@@ -1,4 +1,6 @@
-import { gql, useMutation } from "@apollo/client"
+// @ts-nocheck
+
+import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { useSession } from "next-auth/client"
 import Head from "next/head"
@@ -7,10 +9,35 @@ import { Fragment, useState, useRef, useEffect } from "react"
 import Modal from "components/Modal"
 import { toast } from "react-toastify"
 import { NextPageContext } from "next"
+import { useRouter } from "next/router"
+import AdCard from "components/Ad"
+import { getWindowSize } from "helpers/getWindowSize"
 
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
 type Handler = "Buyer" | "Seller"
+
+const USERS_ADS = gql`
+	query getUserAds($id: String) {
+		user(_id: $id) {
+			ads {
+				title
+				slug
+				description
+				category
+				images
+				price
+				adtype
+				createdAt
+				negotiable
+				workingHours
+				offlineOnly
+				workingPeriod
+				salaryPeriod
+			}
+		}
+	}
+`
 
 const CREATE_AD = gql`
 	mutation createAd(
@@ -80,6 +107,8 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [userId, setUserId] = useState<string>("")
 
 	const [session, loading] = useSession()
+	const router = useRouter()
+	const { width } = getWindowSize()
 
 	const imageSelected = (e) => {
 		if (e.target.files) {
@@ -96,18 +125,22 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		}
 	}
 
+	const [getUserAds, { data, loading: gettingUserAds, error }] =
+		useLazyQuery(USERS_ADS)
 	const [uploadAd, { loading: uploadingAd }] = useMutation(CREATE_AD)
 
 	useEffect(() => {
 		if (loading) setMessage("Fetching Session...")
 		if (uploadingAd) setMessage("Saving Data...")
 
-		// @ts-ignore
-		if (session) setUserId(session?.user?.sub)
+		if (session) {
+			setUserId(session?.user?.sub)
+			if (width >= 1024) getUserAds({ variables: { id: session?.user?.sub } })
+		}
 
-		if (loading || uploadingAd) setModal(true)
+		if (loading || uploadingAd || gettingUserAds) setModal(true)
 		else setModal(false)
-	}, [loading, uploadingAd])
+	}, [loading, uploadingAd, data, width])
 
 	const createAd = async () => {
 		if (!images.length) {
@@ -157,7 +190,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 				condition: adtype === "Job" ? "" : condition,
 				shippingBy: adtype === "Job" ? "" : handler,
 				published: published && new Date(),
-				// @ts-ignore
 				createdBy: userId
 			})
 		})
@@ -609,10 +641,29 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 					</button>
 				</form>
 
-				<div className="flex-col w-1/3 p-3 lg:flex hidden">
+				<div className="flex-col w-1/3 p-3 lg:flex hidden items-center">
 					<div className="text-2xl font-cursive text-center block">
 						Your Previous Ads
 					</div>
+					{data?.user &&
+						data.user.ads
+							.filter((_, i) => i < 2)
+							.map((ad, index) => (
+								<AdCard
+									details={ad}
+									router={router}
+									loggedIn={!!session?.user?.sub}
+									key={`ad-${index + 1}`}
+								/>
+							))}
+					{data?.user?.ads?.length > 2 && (
+						<div
+							onClick={() => router.push(`/profile/${session?.user?.sub}/ads`)}
+							className="text-lg font-semibold pt-2 text-center cursor-pointer"
+						>
+							Show more
+						</div>
+					)}
 				</div>
 			</div>
 		</Fragment>
