@@ -2,28 +2,10 @@ import { Ad } from "models/Ad"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { NextRouter } from "next/router"
 import { gql, useMutation } from "@apollo/client"
+import { durationShort } from "helpers/duration"
 
 import store from "store"
 import shallow from "zustand/shallow"
-
-const durationShort = (duration: string) => {
-	switch (duration) {
-		case "Day":
-			return "daily"
-		case "Week":
-			return "weekly"
-		case "Month":
-			return "PM"
-		case "Quarter":
-			return "quarterly"
-		case "Year":
-			return "PA"
-		case "Contract":
-			return "once"
-		default:
-			return duration
-	}
-}
 
 type AdProps = {
 	userId: string

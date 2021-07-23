@@ -31,7 +31,7 @@ const Home = ({ ads, user, userId }: HomeProps): JSX.Element => {
 	return (
 		<Fragment>
 			<Head>
-				<title>Firozi | Ads</title>
+				<title>Ads | Firozi</title>
 			</Head>
 
 			<button
