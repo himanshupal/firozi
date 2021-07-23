@@ -39,6 +39,9 @@ const Query: DocumentNode = gql`
 			location: String
 			createdBy: String
 		): Boolean
+
+		saveAd(ad: ID!, user: ID!): Boolean
+		unsaveAd(ad: ID!, user: ID!): Boolean
 	}
 `
 

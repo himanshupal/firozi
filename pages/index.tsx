@@ -1,5 +1,5 @@
 import Head from "next/head"
-import { Fragment, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 
 import AdCard from "components/Ad"
 import { Ad } from "models/Ad"
@@ -10,9 +10,10 @@ import Login from "components/Login"
 import { useRouter } from "next/router"
 import { useSession } from "next-auth/client"
 
-const GET_ADS = gql`
-	{
+export const GET_ADS = gql`
+	query ads($userId: String) {
 		ads {
+			_id
 			title
 			slug
 			description
@@ -27,6 +28,10 @@ const GET_ADS = gql`
 			salaryPeriod
 			location
 		}
+		user(_id: $userId) {
+			_id
+			saved
+		}
 	}
 `
 
@@ -36,7 +41,10 @@ const Home = (): JSX.Element => {
 	const [session, sessionLoading] = useSession()
 	const router = useRouter()
 
-	const { data, loading, error } = useQuery(GET_ADS)
+	const { data, loading, error } = useQuery(GET_ADS, {
+		// @ts-ignore
+		variables: { userId: session?.user?.sub }
+	})
 
 	if (loading || sessionLoading) {
 		return <Loading message="Loading Ads" />
@@ -45,6 +53,8 @@ const Home = (): JSX.Element => {
 	if (error) {
 		return <Modal title={error?.networkError?.name || error.message} fixed />
 	}
+
+	// useEffect(() => console.log({ userData: data?.user }), [])
 
 	return (
 		<Fragment>
@@ -59,7 +69,7 @@ const Home = (): JSX.Element => {
 						? router.push(`/ad/create`)
 						: setLogin((login) => !login)
 				}
-				className="bg-blood p-2 absolute bottom-6 right-0 text-center text-sm text-white"
+				className="bg-blood p-2 absolute bottom-6 right-0 text-center text-sm text-white z-10"
 			>
 				<img
 					width="24"
@@ -73,13 +83,13 @@ const Home = (): JSX.Element => {
 
 			{data?.ads?.length ? (
 				<div className="bricks p-4 text-center gap-4">
-					{data.ads.map((ad: Ad, index: number) => (
+					{data.ads.map((ad: Ad & { saved: Array<string> }, index: number) => (
 						<AdCard
-							details={ad}
+							details={{ ...ad, saved: data.user?.saved }}
 							loginToggle={setLogin}
 							router={router}
 							// @ts-ignore
-							loggedIn={!!session?.user?.sub}
+							loggedIn={session?.user?.sub}
 							key={`ad-${index + 1}`}
 						/>
 					))}

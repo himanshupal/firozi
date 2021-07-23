@@ -9,9 +9,9 @@ export interface User {
 	contact?: string
 	hidden?: Boolean
 	location?: string
-	ads?: [Ad]
-	saved?: [Ad]
-	follows?: [User]
+	ads?: Array<Ad>
+	saved?: Array<string>
+	follows?: Array<User>
 	createdAt?: string
 	updatedAt?: string
 	lastOnline?: string

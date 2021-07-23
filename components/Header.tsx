@@ -14,6 +14,7 @@ import routes from "data/navlinks"
 const GET_AVATAR = gql`
 	query getUser($id: String!) {
 		user(_id: $id) {
+			_id
 			avatar
 		}
 	}

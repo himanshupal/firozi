@@ -19,6 +19,7 @@ const contactRegex = /[\+\-0-9]+/
 const USER_DETAILS = gql`
 	query getUser($id: String!) {
 		user(_id: $id) {
+			_id
 			name
 			email
 			avatar

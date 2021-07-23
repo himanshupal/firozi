@@ -1,6 +1,9 @@
 import { Ad } from "models/Ad"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect } from "react"
 import { NextRouter } from "next/router"
+import { gql, useMutation } from "@apollo/client"
+
+import { GET_ADS } from "pages/index"
 
 const durationShort = (duration: string) => {
 	switch (duration) {
@@ -22,17 +25,30 @@ const durationShort = (duration: string) => {
 }
 
 type AdProps = {
-	loggedIn: boolean
+	loggedIn: string
 	router: NextRouter
 	loginToggle?: Dispatch<SetStateAction<boolean>>
-	details: Ad
+	details: Ad & { saved: Array<string> }
 }
+
+const SAVE_AD = gql`
+	mutation saveAd($ad: ID!, $user: ID!) {
+		saveAd(ad: $ad, user: $user)
+	}
+`
+
+const UNSAVE_AD = gql`
+	mutation unsaveAd($ad: ID!, $user: ID!) {
+		unsaveAd(ad: $ad, user: $user)
+	}
+`
 
 const AdCard = ({
 	loggedIn,
 	router,
 	loginToggle,
 	details: {
+		_id,
 		title,
 		slug,
 		images,
@@ -46,12 +62,83 @@ const AdCard = ({
 		published,
 		workingHours,
 		workingPeriod,
-		offlineOnly
+		offlineOnly,
+		saved
 	}
 }: AdProps) => {
+	const [saveAd, { loading: savingAd }] = useMutation(SAVE_AD, {
+		variables: { ad: _id, user: loggedIn },
+		update(cache, { data: { saveAd } }) {
+			let { ads, user } = cache.readQuery({
+				query: GET_ADS,
+				variables: { userId: loggedIn }
+			})
+
+			if (saveAd)
+				cache.writeQuery({
+					query: GET_ADS,
+					variables: { userId: loggedIn },
+					data: {
+						ads: {
+							ads,
+							user: {
+								saved: [...user.saved, _id]
+							}
+						}
+					}
+				})
+		}
+	})
+	const [unsaveAd, { loading: unsavingAd }] = useMutation(UNSAVE_AD, {
+		variables: { ad: _id, user: loggedIn },
+		update(cache, { data: { unsaveAd } }) {
+			let { ads, user } = cache.readQuery({
+				query: GET_ADS,
+				variables: { userId: loggedIn }
+			})
+
+			if (unsaveAd)
+				cache.writeQuery({
+					query: GET_ADS,
+					variables: { userId: loggedIn },
+					data: {
+						ads: {
+							ads,
+							user: {
+								saved: saved.filter((x) => x !== _id.toString())
+							}
+						}
+					}
+				})
+		}
+	})
+
 	return (
-		<div className="rounded-xl text-blood w-72 shadow-lg inline-block my-3 mx-3 text-left hover:shadow-2xl transition-all">
-			<div className="absolute w-8 text-xs "></div>
+		<div className="rounded-xl text-blood w-72 shadow-lg inline-block my-3 mx-3 text-left hover:shadow-2xl transition-all relative">
+			{!!loggedIn && (
+				<div
+					onClick={() => {
+						if (saved?.includes(_id.toString())) unsaveAd()
+						else saveAd()
+					}}
+					className={`absolute rounded right-2 top-2 p-1 bg-white ${
+						savingAd || unsavingAd ? `cursor-wait` : `cursor-pointer`
+					}`}
+				>
+					<img
+						width="16"
+						height="16"
+						src={`/icons/${
+							saved?.includes(_id.toString()) ? `check` : `save`
+						}.svg`}
+						alt="Save Icon"
+					/>
+				</div>
+			)}
+
+			<div className="absolute py-0.5 px-1.5 text-xs bg-white text-blood left-2 top-2 rounded cursor-pointer">
+				{adtype}
+			</div>
 
 			{images?.map(
 				(image, index) =>
@@ -66,7 +153,7 @@ const AdCard = ({
 			)}
 			<div
 				onClick={() =>
-					loggedIn ? router.push(`/${slug}`) : loginToggle((login) => !login)
+					!!loggedIn ? router.push(`/${slug}`) : loginToggle((login) => !login)
 				}
 				className="text-3xl font-bold py-1 px-3 cursor-pointer"
 			>

@@ -6,6 +6,8 @@ import ad from "./ad"
 
 import updateUser from "./updateUser"
 import createAd from "./createAd"
+import unsaveAd from "./unsaveAd"
+import saveAd from "./saveAd"
 
 const resolution: IResolvers = {
 	Query: {
@@ -18,7 +20,9 @@ const resolution: IResolvers = {
 	},
 	Mutation: {
 		updateUser,
-		createAd
+		createAd,
+		unsaveAd,
+		saveAd
 	}
 }
 

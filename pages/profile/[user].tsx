@@ -13,6 +13,7 @@ import { gql, useLazyQuery } from "@apollo/client"
 const USER_DETAILS = gql`
 	query getUser($id: String!) {
 		user(_id: $id) {
+			_id
 			name
 			email
 			avatar

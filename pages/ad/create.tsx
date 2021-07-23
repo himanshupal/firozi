@@ -20,6 +20,7 @@ type Handler = "Buyer" | "Seller"
 const USERS_ADS = gql`
 	query getUserAds($id: String) {
 		user(_id: $id) {
+			_id
 			ads {
 				title
 				slug
@@ -656,14 +657,22 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 									key={`ad-${index + 1}`}
 								/>
 							))}
-					{data?.user?.ads?.length > 2 && (
-						<div
-							onClick={() => router.push(`/profile/${session?.user?.sub}/ads`)}
-							className="text-lg font-semibold pt-2 text-center cursor-pointer"
-						>
-							Show more
-						</div>
-					)}
+					<div className="pt-4">
+						{gettingUserAds
+							? `Loading Ads...`
+							: data?.user?.ads?.length === 0
+							? `You haven't posted any ads yet!`
+							: data?.user?.ads?.length > 2 && (
+									<div
+										onClick={() =>
+											router.push(`/profile/${session?.user?.sub}/ads`)
+										}
+										className="text-lg font-semibold pt-2 text-center cursor-pointer"
+									>
+										Show more
+									</div>
+							  )}
+					</div>
 				</div>
 			</div>
 		</Fragment>
