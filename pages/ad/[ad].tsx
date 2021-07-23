@@ -1,5 +1,4 @@
 import { useRouter } from "next/router"
-
 const Ad = (): JSX.Element => {
 	const {
 		query: { ad }

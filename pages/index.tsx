@@ -1,60 +1,32 @@
 import Head from "next/head"
-import { Fragment, useEffect, useState } from "react"
-
-import AdCard from "components/Ad"
-import { Ad } from "models/Ad"
-import { gql, useQuery } from "@apollo/client"
-import Loading from "components/Loading"
-import Modal from "components/Modal"
-import Login from "components/Login"
+import { NextPageContext } from "next"
 import { useRouter } from "next/router"
-import { useSession } from "next-auth/client"
+import { Fragment, useEffect, useState } from "react"
+import { getSession } from "next-auth/client"
 
-export const GET_ADS = gql`
-	query ads($userId: String) {
-		ads {
-			_id
-			title
-			slug
-			description
-			images
-			price
-			adtype
-			condition
-			negotiable
-			workingHours
-			offlineOnly
-			workingPeriod
-			salaryPeriod
-			location
-		}
-		user(_id: $userId) {
-			_id
-			saved
-		}
-	}
-`
+import { Ad } from "models/Ad"
+import AdCard from "components/Ad"
+import Login from "components/Login"
+import client from "helpers/apolloclient"
+import { gql } from "@apollo/client"
+import { User } from "models/User"
 
-const Home = (): JSX.Element => {
+import store from "store"
+
+interface HomeProps {
+	ads: Array<Ad>
+	user: User
+	userId: string
+}
+
+const Home = ({ ads, user, userId }: HomeProps): JSX.Element => {
 	const [login, setLogin] = useState<boolean>(false)
 
-	const [session, sessionLoading] = useSession()
+	const replaceSaved = store((state) => state.replaceSaved)
+
 	const router = useRouter()
 
-	const { data, loading, error } = useQuery(GET_ADS, {
-		// @ts-ignore
-		variables: { userId: session?.user?.sub }
-	})
-
-	if (loading || sessionLoading) {
-		return <Loading message="Loading Ads" />
-	}
-
-	if (error) {
-		return <Modal title={error?.networkError?.name || error.message} fixed />
-	}
-
-	// useEffect(() => console.log({ userData: data?.user }), [])
+	useEffect(() => replaceSaved(user?.saved), [user])
 
 	return (
 		<Fragment>
@@ -64,10 +36,7 @@ const Home = (): JSX.Element => {
 
 			<button
 				onClick={() =>
-					// @ts-ignore
-					session?.user?.sub
-						? router.push(`/ad/create`)
-						: setLogin((login) => !login)
+					!!userId ? router.push(`/ad/create`) : setLogin((login) => !login)
 				}
 				className="bg-blood p-2 absolute bottom-6 right-0 text-center text-sm text-white z-10"
 			>
@@ -81,15 +50,15 @@ const Home = (): JSX.Element => {
 				<div>New Ad</div>
 			</button>
 
-			{data?.ads?.length ? (
+			{ads?.length ? (
 				<div className="bricks p-4 text-center gap-4">
-					{data.ads.map((ad: Ad & { saved: Array<string> }, index: number) => (
+					{ads.map((ad: Ad, index: number) => (
 						<AdCard
-							details={{ ...ad, saved: data.user?.saved }}
-							loginToggle={setLogin}
+							details={ad}
+							userId={userId}
 							router={router}
-							// @ts-ignore
-							loggedIn={session?.user?.sub}
+							// saved={user?.saved}
+							loginToggle={setLogin}
 							key={`ad-${index + 1}`}
 						/>
 					))}
@@ -108,3 +77,42 @@ const Home = (): JSX.Element => {
 	)
 }
 export default Home
+
+export const getServerSideProps = async ({ req }: NextPageContext) => {
+	const session = await getSession({ req })
+
+	// @ts-ignore
+	const userId = session?.user?.sub || null
+
+	const {
+		data: { ads, user }
+	} = await client.query({
+		query: gql`
+			query ads($userId: String) {
+				ads {
+					_id
+					title
+					slug
+					description
+					images
+					price
+					adtype
+					condition
+					negotiable
+					workingHours
+					offlineOnly
+					workingPeriod
+					salaryPeriod
+					location
+				}
+				user(_id: $userId) {
+					_id
+					saved
+				}
+			}
+		`,
+		variables: { userId }
+	})
+
+	return { props: { ads, user, userId } }
+}

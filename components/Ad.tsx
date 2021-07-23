@@ -1,9 +1,10 @@
 import { Ad } from "models/Ad"
-import { Dispatch, SetStateAction, useEffect } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { NextRouter } from "next/router"
 import { gql, useMutation } from "@apollo/client"
 
-import { GET_ADS } from "pages/index"
+import store from "store"
+import shallow from "zustand/shallow"
 
 const durationShort = (duration: string) => {
 	switch (duration) {
@@ -25,10 +26,11 @@ const durationShort = (duration: string) => {
 }
 
 type AdProps = {
-	loggedIn: string
+	userId: string
 	router: NextRouter
 	loginToggle?: Dispatch<SetStateAction<boolean>>
-	details: Ad & { saved: Array<string> }
+	details: Ad
+	// saved: Array<string>
 }
 
 const SAVE_AD = gql`
@@ -44,7 +46,8 @@ const UNSAVE_AD = gql`
 `
 
 const AdCard = ({
-	loggedIn,
+	// saved,
+	userId,
 	router,
 	loginToggle,
 	details: {
@@ -62,65 +65,34 @@ const AdCard = ({
 		published,
 		workingHours,
 		workingPeriod,
-		offlineOnly,
-		saved
+		offlineOnly
 	}
 }: AdProps) => {
-	const [saveAd, { loading: savingAd }] = useMutation(SAVE_AD, {
-		variables: { ad: _id, user: loggedIn },
-		update(cache, { data: { saveAd } }) {
-			let { ads, user } = cache.readQuery({
-				query: GET_ADS,
-				variables: { userId: loggedIn }
-			})
+	const [saved, pushSaved, pullSaved] = store(
+		(state) => [state.saved, state.pushSaved, state.pullSaved],
+		shallow
+	)
 
-			if (saveAd)
-				cache.writeQuery({
-					query: GET_ADS,
-					variables: { userId: loggedIn },
-					data: {
-						ads: {
-							ads,
-							user: {
-								saved: [...user.saved, _id]
-							}
-						}
-					}
-				})
+	const [saveAd, { loading: savingAd }] = useMutation(SAVE_AD, {
+		variables: { ad: _id, user: userId },
+		update(_, { data: { saveAd } }) {
+			if (saveAd) pushSaved(_id.toString())
 		}
 	})
 	const [unsaveAd, { loading: unsavingAd }] = useMutation(UNSAVE_AD, {
-		variables: { ad: _id, user: loggedIn },
-		update(cache, { data: { unsaveAd } }) {
-			let { ads, user } = cache.readQuery({
-				query: GET_ADS,
-				variables: { userId: loggedIn }
-			})
-
-			if (unsaveAd)
-				cache.writeQuery({
-					query: GET_ADS,
-					variables: { userId: loggedIn },
-					data: {
-						ads: {
-							ads,
-							user: {
-								saved: saved.filter((x) => x !== _id.toString())
-							}
-						}
-					}
-				})
+		variables: { ad: _id, user: userId },
+		update(_, { data: { unsaveAd } }) {
+			if (unsaveAd) pullSaved(_id.toString())
 		}
 	})
 
 	return (
 		<div className="rounded-xl text-blood w-72 shadow-lg inline-block my-3 mx-3 text-left hover:shadow-2xl transition-all relative">
-			{!!loggedIn && (
+			{!!userId && (
 				<div
-					onClick={() => {
-						if (saved?.includes(_id.toString())) unsaveAd()
-						else saveAd()
-					}}
+					onClick={() =>
+						saved?.includes(_id.toString()) ? unsaveAd() : saveAd()
+					}
 					className={`absolute rounded right-2 top-2 p-1 bg-white ${
 						savingAd || unsavingAd ? `cursor-wait` : `cursor-pointer`
 					}`}
@@ -153,7 +125,7 @@ const AdCard = ({
 			)}
 			<div
 				onClick={() =>
-					!!loggedIn ? router.push(`/${slug}`) : loginToggle((login) => !login)
+					!!userId ? router.push(`/ad/${slug}`) : loginToggle((login) => !login)
 				}
 				className="text-3xl font-bold py-1 px-3 cursor-pointer"
 			>

@@ -6,7 +6,7 @@
 	},
 	"license": "GPL-3.0-or-later",
 	"scripts": {
-		"dev": "next dev",
+		"dev": "next dev -p 3001",
 		"lint": "next lint",
 		"start": "next start",
 		"build": "next build"
@@ -26,7 +26,8 @@
 		"react-dom": "^17.0.2",
 		"react-toastify": "^7.0.4",
 		"swiper": "^6.7.5",
-		"tailwindcss": "^2.2.4"
+		"tailwindcss": "^2.2.4",
+		"zustand": "^3.5.7"
 	},
 	"devDependencies": {
 		"@types/node": "^15.12.5",
