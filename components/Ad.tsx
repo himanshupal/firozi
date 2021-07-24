@@ -12,7 +12,6 @@ type AdProps = {
 	router: NextRouter
 	loginToggle?: Dispatch<SetStateAction<boolean>>
 	details: Ad
-	// saved: Array<string>
 }
 
 const SAVE_AD = gql`
@@ -28,7 +27,6 @@ const UNSAVE_AD = gql`
 `
 
 const AdCard = ({
-	// saved,
 	userId,
 	router,
 	loginToggle,

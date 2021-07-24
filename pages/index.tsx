@@ -57,7 +57,6 @@ const Home = ({ ads, user, userId }: HomeProps): JSX.Element => {
 							details={ad}
 							userId={userId}
 							router={router}
-							// saved={user?.saved}
 							loginToggle={setLogin}
 							key={`ad-${index + 1}`}
 						/>
