@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { useSession } from "next-auth/client"
@@ -135,7 +133,9 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		if (uploadingAd) setMessage("Saving Data...")
 
 		if (session) {
+			// @ts-ignore
 			setUserId(session?.user?.sub)
+			// @ts-ignore
 			if (width >= 1024) getUserAds({ variables: { id: session?.user?.sub } })
 		}
 
@@ -651,9 +651,9 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							.filter((_, i) => i < 2)
 							.map((ad, index) => (
 								<AdCard
-									details={ad}
-									router={router}
-									loggedIn={!!session?.user?.sub}
+									ad={ad}
+									// @ts-ignore
+									userId={session?.user?.sub}
 									key={`ad-${index + 1}`}
 								/>
 							))}
@@ -665,6 +665,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							: data?.user?.ads?.length > 2 && (
 									<div
 										onClick={() =>
+											// @ts-ignore
 											router.push(`/profile/${session?.user?.sub}/ads`)
 										}
 										className="text-lg font-semibold pt-2 text-center cursor-pointer"

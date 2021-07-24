@@ -12,14 +12,16 @@ import { gql } from "@apollo/client"
 import { User } from "models/User"
 
 import store from "store"
+import Modal from "components/Modal"
 
 interface HomeProps {
 	ads: Array<Ad>
 	user: User
+	error: string
 	userId: string
 }
 
-const Home = ({ ads, user, userId }: HomeProps): JSX.Element => {
+const Home = ({ ads, user, userId, error }: HomeProps): JSX.Element => {
 	const [login, setLogin] = useState<boolean>(false)
 
 	const replaceSaved = store((state) => state.replaceSaved)
@@ -33,6 +35,8 @@ const Home = ({ ads, user, userId }: HomeProps): JSX.Element => {
 			<Head>
 				<title>Ads | Firozi</title>
 			</Head>
+
+			{error && <Modal title={error} fixed />}
 
 			<button
 				onClick={() =>
@@ -49,14 +53,12 @@ const Home = ({ ads, user, userId }: HomeProps): JSX.Element => {
 				/>
 				<div>New Ad</div>
 			</button>
-
 			{ads?.length ? (
 				<div className="bricks p-4 text-center gap-4">
 					{ads.map((ad: Ad, index: number) => (
 						<AdCard
-							details={ad}
+							ad={ad}
 							userId={userId}
-							router={router}
 							loginToggle={setLogin}
 							key={`ad-${index + 1}`}
 						/>
@@ -70,7 +72,6 @@ const Home = ({ ads, user, userId }: HomeProps): JSX.Element => {
 					</div>
 				</div>
 			)}
-
 			{login && <Login toggle={setLogin} />}
 		</Fragment>
 	)
@@ -84,7 +85,8 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
 	const userId = session?.user?.sub || null
 
 	const {
-		data: { ads, user }
+		data: { ads, user },
+		error
 	} = await client.query({
 		query: gql`
 			query ads($userId: String) {
@@ -113,5 +115,5 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
 		variables: { userId }
 	})
 
-	return { props: { ads, user, userId } }
+	return { props: { ads, user, userId, error: error?.message || null } }
 }

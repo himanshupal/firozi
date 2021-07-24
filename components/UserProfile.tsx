@@ -31,7 +31,7 @@ const UserProfile = ({ userDetails }: UserProfile): JSX.Element => {
 					.map((key, index) => (
 						<div
 							key={index}
-							className="flex flex-col sm:flex-row gap-5 sm:items-center"
+							className="flex flex-col sm:flex-row gap-y-1.5 gap-x-5 sm:items-center"
 						>
 							<div className="text-white text-xs font-thin bg-blood px-4 py-1 w-20 text-center rounded capitalize">
 								{key}

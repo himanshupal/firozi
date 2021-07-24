@@ -5,15 +5,17 @@ import { Ad as AdModel } from "models/Ad"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
 import { Fragment, useEffect, useState } from "react"
-import SwiperCore, { Pagination } from "swiper/core"
+import SwiperCore, { Mousewheel, Navigation, Pagination } from "swiper/core"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { durationShort } from "helpers/duration"
 import Modal from "components/Modal"
 
 import "swiper/swiper.min.css"
+import "swiper/components/navigation/navigation.min.css"
 import "swiper/components/pagination/pagination.min.css"
+import AdCard from "components/Ad"
 
-SwiperCore.use([Pagination])
+SwiperCore.use([Pagination, Navigation, Mousewheel])
 
 interface AdProps {
 	ad: AdModel
@@ -22,7 +24,6 @@ interface AdProps {
 
 const Ad = ({ ad, error }: AdProps): JSX.Element => {
 	const [avatar, setAvatar] = useState<string>()
-
 	useEffect(() => {
 		const getHash = async () => {
 			const res = await fetch("/api/getMD5", {
@@ -47,6 +48,7 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 					<Swiper
 						className="w-full"
 						pagination={{ dynamicBullets: true, clickable: true }}
+						mousewheel={true}
 					>
 						{ad.images?.map((image, index) => (
 							<SwiperSlide key={`slide-${index + 1}`}>
@@ -60,10 +62,6 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 							</SwiperSlide>
 						))}
 					</Swiper>
-
-					{/* <div className="my-4 py-1 mx-6 md:mx-12 px-6 bg-blood text-white text-sm font-thin rounded-full max-w-max">
-						{ad.category}
-					</div> */}
 
 					<div className="my-4 md:mr-12 px-6 md:px-12 py-1 bg-blue-600 text-white text-sm font-thin overflow-x-auto md:rounded-r-full whitespace-nowrap">
 						{ad.category}
@@ -90,7 +88,9 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 									{durationShort(ad.salaryPeriod)}
 								</span>
 							)}
-							{true && <span className="font-thin text-lg"> [Negotiable]</span>}
+							{ad.negotiable && (
+								<span className="font-thin text-lg"> [Negotiable]</span>
+							)}
 						</div>
 
 						<div className="md:text-xl font-thin">{ad.description}</div>
@@ -110,7 +110,8 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 						{ad.offlineOnly && (
 							<div className="text-sm pt-1 mt-2 font-mono bg-yellow-500 text-blood max-w-max">
 								⚠️ This is an <span className="font-bold">offline only </span>
-								job, apply only if you've no issues relocating.
+								job, apply only if you&#39;ve no issues relocating after
+								pandemic ends.
 							</div>
 						)}
 
@@ -129,8 +130,8 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 					</div>
 				</div>
 
-				<div className="flex flex-col w-full md:w-1/3 px-6 md:items-center max-h-screen md:text-center pb-6 md:pb-0">
-					<div className="text-2xl py-3 font-extralight">Created by</div>
+				<div className="flex flex-col w-full md:w-1/3 px-6 items-center text-center pb-6">
+					<div className="text-2xl py-3 font-extralight">Ad posted by</div>
 					{ad.createdBy ? (
 						<>
 							<img
@@ -163,7 +164,11 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 										</a>
 									)}
 									{ad.createdBy?.email && (
-										<a href={`mailto:${ad.createdBy.email}`} target="_blank">
+										<a
+											href={`mailto:${ad.createdBy.email}`}
+											target="_blank"
+											rel="noreferrer"
+										>
 											<div className="text-lg lg:text-2xl">
 												{ad.createdBy.email}
 											</div>
@@ -181,6 +186,48 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 							<div className="text-xs text-green-800">[ ACCOUNT DELETED ]</div>
 						</>
 					)}
+				</div>
+			</div>
+
+			<div className="flex flex-col">
+				<div className="px-6 py-3 md:px-10 text-3xl">
+					More Ads by {ad.createdBy?.name ?? "User"}
+				</div>
+				<div className="w-full flex px-6 md:px-12 pb-0 md:pb-7 overflow-auto">
+					<Swiper slidesPerView={"auto"} mousewheel={true} navigation={true}>
+						{new Array(5).fill(0).map((_, index) => (
+							<SwiperSlide
+								key={`slide-${index + 1}`}
+								className="slide__width-auto"
+							>
+								<AdCard
+									ad={ad}
+									userId={ad.createdBy?._id?.toString()}
+									key={"UserAd-" + index}
+								/>
+							</SwiperSlide>
+						))}
+					</Swiper>
+				</div>
+
+				<div className="px-6 py-3 md:px-10 text-3xl">
+					Latest ads from this category
+				</div>
+				<div className="w-full flex px-6 md:px-12 pb-0 md:pb-7 overflow-auto">
+					<Swiper slidesPerView={"auto"} mousewheel={true} navigation={true}>
+						{new Array(5).fill(0).map((_, index) => (
+							<SwiperSlide
+								key={`slide-${index + 1}`}
+								className="slide__width-auto"
+							>
+								<AdCard
+									ad={ad}
+									userId={ad.createdBy?._id?.toString()}
+									key={"LatestAd-" + index}
+								/>
+							</SwiperSlide>
+						))}
+					</Swiper>
 				</div>
 			</div>
 		</Fragment>
@@ -241,7 +288,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
 	return {
 		props: {
-			ad,
+			ad: { ...ad, slug },
 			error: error?.message || null
 		}
 	}

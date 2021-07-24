@@ -1,6 +1,6 @@
 import { Ad } from "models/Ad"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { NextRouter } from "next/router"
+import { useRouter } from "next/router"
+import { Dispatch, SetStateAction } from "react"
 import { gql, useMutation } from "@apollo/client"
 import { durationShort } from "helpers/duration"
 
@@ -9,9 +9,8 @@ import shallow from "zustand/shallow"
 
 type AdProps = {
 	userId: string
-	router: NextRouter
 	loginToggle?: Dispatch<SetStateAction<boolean>>
-	details: Ad
+	ad: Ad
 }
 
 const SAVE_AD = gql`
@@ -28,9 +27,8 @@ const UNSAVE_AD = gql`
 
 const AdCard = ({
 	userId,
-	router,
 	loginToggle,
-	details: {
+	ad: {
 		_id,
 		title,
 		slug,
@@ -48,6 +46,8 @@ const AdCard = ({
 		offlineOnly
 	}
 }: AdProps) => {
+	const router = useRouter()
+
 	const [saved, pushSaved, pullSaved] = store(
 		(state) => [state.saved, state.pushSaved, state.pullSaved],
 		shallow
@@ -67,7 +67,11 @@ const AdCard = ({
 	})
 
 	return (
-		<div className="rounded-xl text-blood w-72 shadow-lg inline-block my-3 mx-3 text-left hover:shadow-2xl transition-all relative">
+		<div
+			className={`rounded-xl text-blood w-72 shadow-lg my-3 mx-3 text-left hover:shadow-2xl transition-all relative ${
+				router.pathname === "/" ? `inline-block` : `flex flex-col flex-shrink-0`
+			}`}
+		>
 			{!!userId && (
 				<div
 					onClick={() =>
@@ -127,7 +131,7 @@ const AdCard = ({
 					)}
 				</div>
 			</div>
-			<div className="py-1 px-3 text-sm leading-tight">
+			<div className="py-1 px-3 text-sm leading-tight flex-grow">
 				{description?.length > 175
 					? description?.slice(0, 175) + "..."
 					: description}

@@ -11,8 +11,6 @@ import { filter } from "helpers/filter"
 import { toast } from "react-toastify"
 import Loading from "components/Loading"
 import Modal from "components/Modal"
-import router from "next/router"
-
 const nameRegex = /[\sa-zA-Z]+/
 const contactRegex = /[\+\-0-9]+/
 

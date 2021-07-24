@@ -13,8 +13,13 @@ import "styles/site.scss"
 import "swiper/swiper.scss"
 import "tailwindcss/tailwind.css"
 import "react-toastify/dist/ReactToastify.css"
+import { useEffect } from "react"
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
+	useEffect(() => {
+		if (process?.env?.NODE_ENV === "development") document.designMode = "on"
+	}, [])
+
 	return (
 		<Provider session={pageProps.session}>
 			<ApolloProvider client={client}>
