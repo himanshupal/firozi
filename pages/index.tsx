@@ -56,12 +56,7 @@ const Home = ({ ads, user, userId, error }: HomeProps): JSX.Element => {
 			{ads?.length ? (
 				<div className="bricks p-4 text-center gap-4">
 					{ads.map((ad: Ad, index: number) => (
-						<AdCard
-							ad={ad}
-							userId={userId}
-							loginToggle={setLogin}
-							key={`ad-${index + 1}`}
-						/>
+						<AdCard ad={ad} userId={userId} key={`ad-${index + 1}`} />
 					))}
 				</div>
 			) : (

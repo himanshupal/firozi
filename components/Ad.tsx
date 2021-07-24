@@ -1,6 +1,5 @@
 import { Ad } from "models/Ad"
 import { useRouter } from "next/router"
-import { Dispatch, SetStateAction } from "react"
 import { gql, useMutation } from "@apollo/client"
 import { durationShort } from "helpers/duration"
 
@@ -9,7 +8,6 @@ import shallow from "zustand/shallow"
 
 type AdProps = {
 	userId: string
-	loginToggle?: Dispatch<SetStateAction<boolean>>
 	ad: Ad
 }
 
@@ -27,7 +25,6 @@ const UNSAVE_AD = gql`
 
 const AdCard = ({
 	userId,
-	loginToggle,
 	ad: {
 		_id,
 		title,
@@ -108,9 +105,7 @@ const AdCard = ({
 					)
 			)}
 			<div
-				onClick={() =>
-					!!userId ? router.push(`/ad/${slug}`) : loginToggle((login) => !login)
-				}
+				onClick={() => router.push(`/ad/${slug}`)}
 				className="text-3xl font-bold py-1 px-3 cursor-pointer"
 			>
 				{title}

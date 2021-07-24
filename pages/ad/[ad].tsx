@@ -9,6 +9,7 @@ import SwiperCore, { Mousewheel, Navigation, Pagination } from "swiper/core"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { durationShort } from "helpers/duration"
 import Modal from "components/Modal"
+import Login from "components/Login"
 
 import "swiper/swiper.min.css"
 import "swiper/components/navigation/navigation.min.css"
@@ -20,10 +21,13 @@ SwiperCore.use([Pagination, Navigation, Mousewheel])
 interface AdProps {
 	ad: AdModel
 	error: string
+	userId: string
 }
 
-const Ad = ({ ad, error }: AdProps): JSX.Element => {
+const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 	const [avatar, setAvatar] = useState<string>()
+	const [login, setLogin] = useState<boolean>(false)
+
 	useEffect(() => {
 		const getHash = async () => {
 			const res = await fetch("/api/getMD5", {
@@ -130,70 +134,87 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 					</div>
 				</div>
 
-				<div className="flex flex-col w-full md:w-1/3 px-6 items-center text-center pb-6">
-					<div className="text-2xl py-3 font-extralight">Ad posted by</div>
-					{ad.createdBy ? (
-						<>
-							<img
-								src={
-									ad.createdBy?.avatar?.replace(
-										/upload/,
-										"upload/c_limit,h_220,q_75,w_220"
-									) || `https://gravatar.com/avatar/${avatar}?s=220&d=robohash`
-								}
-								alt="User Avatar"
-								className="rounded-full shadow-xl w-40 h-40 md:w-52 md:h-52 object-cover"
-							/>
-							<div className="text-4xl md:text-3xl lg:text-4xl font-semibold pt-4">
-								{ad.createdBy?.name}
-							</div>
-							{ad.createdBy?.hidden ? (
-								<div className="text-lg">
-									The user has hidden its contact details
+				{!!userId ? (
+					<div className="flex flex-col w-full md:w-1/3 px-6 items-center text-center pb-6">
+						<div className="text-2xl py-3 font-extralight">Ad posted by</div>
+						{ad.createdBy ? (
+							<>
+								<img
+									src={
+										ad.createdBy?.avatar?.replace(
+											/upload/,
+											"upload/c_limit,h_220,q_75,w_220"
+										) ||
+										`https://gravatar.com/avatar/${avatar}?s=220&d=robohash`
+									}
+									alt="User Avatar"
+									className="rounded-full shadow-xl w-40 h-40 md:w-52 md:h-52 object-cover"
+								/>
+								<div className="text-4xl md:text-3xl lg:text-4xl font-semibold pt-4">
+									{ad.createdBy?.name}
 								</div>
-							) : (
-								<>
-									{ad.createdBy?.contact && (
-										<a href={`tel:${ad.createdBy.contact}`}>
-											<div className="text-lg lg:text-2xl">
-												{ad.createdBy.contact}
-											</div>
-											<div className="text-xs text-green-800">
-												[ MOBILE NUMBER ]
-											</div>
-										</a>
-									)}
-									{ad.createdBy?.email && (
-										<a
-											href={`mailto:${ad.createdBy.email}`}
-											target="_blank"
-											rel="noreferrer"
-										>
-											<div className="text-lg lg:text-2xl">
-												{ad.createdBy.email}
-											</div>
-											<div className="text-xs text-green-800">
-												[ EMAIL ADDRESS ]
-											</div>
-										</a>
-									)}
-								</>
-							)}
-						</>
-					) : (
-						<>
-							<div className="text-lg text-red-600">Unknown!</div>
-							<div className="text-xs text-green-800">[ ACCOUNT DELETED ]</div>
-						</>
-					)}
-				</div>
+								{ad.createdBy?.hidden ? (
+									<div className="text-lg">
+										The user has hidden its contact details
+									</div>
+								) : (
+									<>
+										{ad.createdBy?.contact && (
+											<a href={`tel:${ad.createdBy.contact}`}>
+												<div className="text-lg lg:text-2xl">
+													{ad.createdBy.contact}
+												</div>
+												<div className="text-xs text-green-800">
+													[ MOBILE NUMBER ]
+												</div>
+											</a>
+										)}
+										{ad.createdBy?.email && (
+											<a
+												href={`mailto:${ad.createdBy.email}`}
+												target="_blank"
+												rel="noreferrer"
+											>
+												<div className="text-lg lg:text-2xl">
+													{ad.createdBy.email}
+												</div>
+												<div className="text-xs text-green-800">
+													[ EMAIL ADDRESS ]
+												</div>
+											</a>
+										)}
+									</>
+								)}
+							</>
+						) : (
+							<>
+								<div className="text-lg text-red-600">Unknown!</div>
+								<div className="text-xs text-green-800">
+									[ ACCOUNT DELETED ]
+								</div>
+							</>
+						)}
+					</div>
+				) : (
+					<div className="text-lg lg:text-2xl font-bold text-center py-2 px-6 md:1/3">
+						You need to{" "}
+						<span
+							className="border-b cursor-pointer"
+							onClick={() => setLogin((l) => !l)}
+						>
+							login
+						</span>{" "}
+						to view contact details of the{" "}
+						{ad.adtype === "Job" ? "employer" : "seller"}
+					</div>
+				)}
 			</div>
 
 			<div className="flex flex-col">
-				<div className="px-6 py-3 md:px-10 text-3xl">
-					More Ads by {ad.createdBy?.name ?? "User"}
+				<div className="px-6 py-3 md:px-12 text-3xl">
+					More Ads by {(userId && ad.createdBy?.name) ?? "User"}
 				</div>
-				<div className="w-full flex px-6 md:px-12 pb-0 md:pb-7 overflow-auto">
+				<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
 					<Swiper slidesPerView={"auto"} mousewheel={true} navigation={true}>
 						{new Array(5).fill(0).map((_, index) => (
 							<SwiperSlide
@@ -210,10 +231,10 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 					</Swiper>
 				</div>
 
-				<div className="px-6 py-3 md:px-10 text-3xl">
+				<div className="px-6 py-3 md:px-12 text-3xl">
 					Latest ads from this category
 				</div>
-				<div className="w-full flex px-6 md:px-12 pb-0 md:pb-7 overflow-auto">
+				<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
 					<Swiper slidesPerView={"auto"} mousewheel={true} navigation={true}>
 						{new Array(5).fill(0).map((_, index) => (
 							<SwiperSlide
@@ -230,6 +251,8 @@ const Ad = ({ ad, error }: AdProps): JSX.Element => {
 					</Swiper>
 				</div>
 			</div>
+
+			{login && <Login toggle={setLogin} />}
 		</Fragment>
 	)
 }
@@ -288,6 +311,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
 	return {
 		props: {
+			userId,
 			ad: { ...ad, slug },
 			error: error?.message || null
 		}
