@@ -30,8 +30,6 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 		shallow
 	)
 
-	console.log("_app", { error, modal })
-
 	return (
 		<Provider session={pageProps.session}>
 			<ApolloProvider client={client}>

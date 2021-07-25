@@ -3,11 +3,14 @@ import { useState } from "react"
 
 import "rc-slider/assets/index.css"
 
-const Menu = (): JSX.Element => {
+const Menu = ({ reference }): JSX.Element => {
 	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })
 
 	return (
-		<div className="h-content flex flex-col overflow-auto bg-blood absolute top-header z-10 min-w-full md:min-w-max md:w-1/4">
+		<div
+			className="h-content flex flex-col overflow-auto bg-blood absolute top-header z-10 min-w-full md:min-w-max md:w-1/4"
+			ref={reference}
+		>
 			<div className="border-t-2 md:py-4 block md:hidden">
 				<div className="pb-3 px-8">
 					<label
