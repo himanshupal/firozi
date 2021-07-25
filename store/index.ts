@@ -1,4 +1,4 @@
-import create, { UseStore } from "zustand"
+import create from "zustand"
 
 interface SavedStore {
 	saved: Array<string>

@@ -4,7 +4,6 @@ import client from "helpers/apolloclient"
 import { Ad as AdModel } from "models/Ad"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
-import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
 import SwiperCore, { Mousewheel, Navigation, Pagination } from "swiper/core"
 import { Swiper, SwiperSlide } from "swiper/react"
@@ -27,8 +26,6 @@ interface AdProps {
 }
 
 const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
-	const router = useRouter()
-
 	const [avatar, setAvatar] = useState<string>()
 	const [login, setLogin] = useState<boolean>(false)
 
@@ -70,6 +67,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 						className="w-full"
 						pagination={{ dynamicBullets: true, clickable: true }}
 						mousewheel={true}
+						loop={true}
 					>
 						{ad.images?.map((image, index) => (
 							<SwiperSlide key={`slide-${index + 1}`}>
@@ -242,7 +240,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 						{new Array(5).fill(0).map((_, index) => (
 							<SwiperSlide
 								key={`slide-${index + 1}`}
-								className="slide__width-auto"
+								className="slide__width-auto flex"
 							>
 								<AdCard
 									ad={ad}
@@ -262,7 +260,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 						{new Array(5).fill(0).map((_, index) => (
 							<SwiperSlide
 								key={`slide-${index + 1}`}
-								className="slide__width-auto"
+								className="slide__width-auto flex"
 							>
 								<AdCard
 									ad={ad}

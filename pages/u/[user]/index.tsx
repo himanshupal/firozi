@@ -5,10 +5,11 @@ import Modal from "components/Modal"
 import Loading from "components/Loading"
 import UserProfile from "components/UserProfile"
 
-import { useEffect } from "react"
+import { Fragment, useEffect } from "react"
 import { useRouter } from "next/router"
 import { useSession } from "next-auth/client"
 import { gql, useLazyQuery } from "@apollo/client"
+import Head from "next/head"
 
 const USER_DETAILS = gql`
 	query getUser($id: String!) {
@@ -47,21 +48,27 @@ const User = (): JSX.Element => {
 	}
 
 	return (
-		<div className="flex flex-col justify-content items-center overflow-auto px-14">
-			<div className="text-5xl font-bold py-6 flex">
-				About Me
-				{user === session?.user?.sub && (
-					<Link href="/profile/edit" passHref>
-						<img
-							className="-translate-y-5 cursor-pointer"
-							src="/icons/edit.svg"
-							alt="Edit Icon"
-						/>
-					</Link>
-				)}
+		<Fragment>
+			<Head>
+				<title>Profile | Firozi</title>
+			</Head>
+
+			<div className="flex flex-col justify-content items-center overflow-auto px-14">
+				<div className="text-5xl font-bold py-6 flex">
+					About Me
+					{user === session?.user?.sub && (
+						<Link href={`/u/${session?.user?.sub}/edit`} passHref>
+							<img
+								className="-translate-y-5 cursor-pointer"
+								src="/icons/edit.svg"
+								alt="Edit Icon"
+							/>
+						</Link>
+					)}
+				</div>
+				{data?.user && <UserProfile userDetails={data.user} />}
 			</div>
-			{data?.user && <UserProfile userDetails={data.user} />}
-		</div>
+		</Fragment>
 	)
 }
 

@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import Head from "next/head"
-import { NextPageContext } from "next"
+import { GetStaticPaths, NextPageContext } from "next"
 import { useRouter } from "next/router"
 
 import { useSession } from "next-auth/client"
@@ -361,4 +361,9 @@ export const getStaticProps = (context: NextPageContext) => ({
 		cloudinaryUrl: process.env.CLOUDINARY_URL,
 		cloudinarySecret: process.env.CLOUDINARY_SECRET
 	}
+})
+
+export const getStaticPaths: GetStaticPaths = async () => ({
+	paths: [],
+	fallback: "blocking"
 })

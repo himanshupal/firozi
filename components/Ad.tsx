@@ -47,7 +47,7 @@ const AdCard = ({ userId, ad }: AdProps) => {
 	return (
 		<div
 			className={`rounded-xl text-blood w-72 shadow-lg my-3 mx-3 text-left hover:shadow-xl transition-all relative ${
-				router.pathname === "/" ? `inline-block` : `flex flex-col flex-shrink-0`
+				router.pathname !== "/" ? `flex flex-col flex-shrink-0` : `inline-block`
 			}`}
 		>
 			{!!userId && (

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import Link from "next/link"
 import { useRouter } from "next/router"
 
@@ -9,7 +7,6 @@ import { Fragment, useEffect, useState } from "react"
 
 import Menu from "components/Menu"
 import Login from "components/Login"
-import routes from "data/navlinks"
 
 const GET_AVATAR = gql`
 	query getUser($id: String!) {
@@ -32,8 +29,16 @@ const Header = (): JSX.Element => {
 	const routeMap = {
 		"/": "Firozi",
 		"/ad/create": "Create new Ad",
-		"/profile/edit": "Update profile"
+		"/u/edit": "Update profile"
 	}
+
+	const routes = [
+		{
+			text: "My Ads",
+			// @ts-ignore
+			path: `/u/${session?.user?.sub}/ads`
+		}
+	]
 
 	const location = Object.keys(routeMap).includes(router.pathname)
 		? routeMap[router.pathname]
@@ -42,6 +47,7 @@ const Header = (): JSX.Element => {
 	const [getUser, { data }] = useLazyQuery(GET_AVATAR)
 
 	useEffect(() => {
+		// @ts-ignore
 		if (session && !data) getUser({ variables: { id: session?.user?.sub } })
 		if (data) {
 			if (data?.user?.avatar)
@@ -99,7 +105,8 @@ const Header = (): JSX.Element => {
 
 			{hover && !loading && session && (
 				<div className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 m-2 z-10">
-					<Link href={`/profile/${session?.user?.sub}`} passHref>
+					{/* @ts-ignore */}
+					<Link href={`/u/${session?.user?.sub}`} passHref>
 						<div className="cursor-pointer my-1 px-6">Profile</div>
 					</Link>
 					{routes.map(({ path, text }, index) => (
