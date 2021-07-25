@@ -4,6 +4,7 @@ import client from "helpers/apolloclient"
 import { Ad as AdModel } from "models/Ad"
 import { GetServerSideProps } from "next"
 import { getSession } from "next-auth/client"
+import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
 import SwiperCore, { Mousewheel, Navigation, Pagination } from "swiper/core"
 import { Swiper, SwiperSlide } from "swiper/react"
@@ -15,6 +16,7 @@ import "swiper/swiper.min.css"
 import "swiper/components/navigation/navigation.min.css"
 import "swiper/components/pagination/pagination.min.css"
 import AdCard from "components/Ad"
+import { toast } from "react-toastify"
 
 SwiperCore.use([Pagination, Navigation, Mousewheel])
 
@@ -25,6 +27,8 @@ interface AdProps {
 }
 
 const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
+	const router = useRouter()
+
 	const [avatar, setAvatar] = useState<string>()
 	const [login, setLogin] = useState<boolean>(false)
 
@@ -38,6 +42,19 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 		}
 		getHash()
 	}, [ad])
+
+	const shareAd = async (e) => {
+		if (navigator.share) {
+			await navigator.share({
+				title: ad.title,
+				text: "Check this Ad I found on Firozi",
+				url: `/ad/${ad.slug}`
+			})
+		} else {
+			await navigator.clipboard.writeText(window.location.href)
+			toast.success("Link to Ad has been copied to your clipboard")
+		}
+	}
 
 	return (
 		<Fragment>
@@ -72,8 +89,14 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 					</div>
 
 					<div className="px-6 md:px-12 pb-3">
-						<div className="text-5xl md:text-7xl text-green-800 font-extrabold">
+						<div className="text-5xl md:text-7xl text-green-800 font-extrabold relative">
 							{ad.title}
+							<img
+								className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-0"
+								onClick={shareAd}
+								src="/icons/share.svg"
+								alt="Share Icon"
+							/>
 						</div>
 
 						{ad?.condition && (
@@ -215,7 +238,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 					More Ads by {(userId && ad.createdBy?.name) ?? "User"}
 				</div>
 				<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
-					<Swiper slidesPerView={"auto"} mousewheel={true} navigation={true}>
+					<Swiper slidesPerView={"auto"} navigation={true}>
 						{new Array(5).fill(0).map((_, index) => (
 							<SwiperSlide
 								key={`slide-${index + 1}`}
@@ -235,7 +258,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 					Latest ads from this category
 				</div>
 				<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
-					<Swiper slidesPerView={"auto"} mousewheel={true} navigation={true}>
+					<Swiper slidesPerView={"auto"} navigation={true}>
 						{new Array(5).fill(0).map((_, index) => (
 							<SwiperSlide
 								key={`slide-${index + 1}`}

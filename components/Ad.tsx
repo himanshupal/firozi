@@ -23,26 +23,7 @@ const UNSAVE_AD = gql`
 	}
 `
 
-const AdCard = ({
-	userId,
-	ad: {
-		_id,
-		title,
-		slug,
-		images,
-		price,
-		adtype,
-		salaryPeriod,
-		condition,
-		negotiable,
-		description,
-		location,
-		published,
-		workingHours,
-		workingPeriod,
-		offlineOnly
-	}
-}: AdProps) => {
+const AdCard = ({ userId, ad }: AdProps) => {
 	const router = useRouter()
 
 	const [saved, pushSaved, pullSaved] = store(
@@ -51,28 +32,28 @@ const AdCard = ({
 	)
 
 	const [saveAd, { loading: savingAd }] = useMutation(SAVE_AD, {
-		variables: { ad: _id, user: userId },
+		variables: { ad: ad._id, user: userId },
 		update(_, { data: { saveAd } }) {
-			if (saveAd) pushSaved(_id.toString())
+			if (saveAd) pushSaved(ad._id.toString())
 		}
 	})
 	const [unsaveAd, { loading: unsavingAd }] = useMutation(UNSAVE_AD, {
-		variables: { ad: _id, user: userId },
+		variables: { ad: ad._id, user: userId },
 		update(_, { data: { unsaveAd } }) {
-			if (unsaveAd) pullSaved(_id.toString())
+			if (unsaveAd) pullSaved(ad._id.toString())
 		}
 	})
 
 	return (
 		<div
-			className={`rounded-xl text-blood w-72 shadow-lg my-3 mx-3 text-left hover:shadow-2xl transition-all relative ${
+			className={`rounded-xl text-blood w-72 shadow-lg my-3 mx-3 text-left hover:shadow-xl transition-all relative ${
 				router.pathname === "/" ? `inline-block` : `flex flex-col flex-shrink-0`
 			}`}
 		>
 			{!!userId && (
 				<div
 					onClick={() =>
-						saved?.includes(_id.toString()) ? unsaveAd() : saveAd()
+						saved?.includes(ad._id.toString()) ? unsaveAd() : saveAd()
 					}
 					className={`absolute rounded right-2 top-2 p-1 bg-white ${
 						savingAd || unsavingAd ? `cursor-wait` : `cursor-pointer`
@@ -82,7 +63,7 @@ const AdCard = ({
 						width="16"
 						height="16"
 						src={`/icons/${
-							saved?.includes(_id.toString()) ? `check` : `save`
+							saved?.includes(ad._id.toString()) ? `check` : `save`
 						}.svg`}
 						alt="Save Icon"
 					/>
@@ -90,52 +71,56 @@ const AdCard = ({
 			)}
 
 			<div className="absolute py-0.5 px-1.5 text-xs bg-white text-blood left-2 top-2 rounded cursor-pointer">
-				{adtype}
+				{ad.adtype}
 			</div>
 
-			{images?.map(
+			{ad.images?.map(
 				(image, index) =>
 					index === 0 && (
 						<img
 							className="w-full object-cover rounded-t-xl"
 							src={image}
-							alt={`${slug}-image`}
+							alt={`${ad.slug}-image`}
 							key={`ad-${index + 1}`}
 						/>
 					)
 			)}
 			<div
-				onClick={() => router.push(`/ad/${slug}`)}
+				onClick={() => router.push(`/ad/${ad.slug}`)}
 				className="text-3xl font-bold py-1 px-3 cursor-pointer"
 			>
-				{title}
+				{ad.title}
 			</div>
 			<div className="flex w-full items-center justify-between bg-gray-300 py-1 px-3">
 				<div className="text-2xl font-semibold flex items-center">
-					₹ {price}/-
-					<span className="text-base pl-2">{durationShort(salaryPeriod)}</span>
+					₹ {ad.price}/-
+					<span className="text-base pl-2">
+						{durationShort(ad.salaryPeriod)}
+					</span>
 				</div>
 				<div className="text-right text-xs">
-					{condition && <div>{condition}</div>}
-					{negotiable && <div>Negotiable</div>}
-					{offlineOnly && <div>Offline Only</div>}
-					{workingHours && workingPeriod && (
+					{ad.condition && <div>{ad.condition}</div>}
+					{ad.negotiable && <div>Negotiable</div>}
+					{ad.offlineOnly && <div>Offline Only</div>}
+					{ad.workingHours && ad.workingPeriod && (
 						<div>
-							{workingHours} hrs/{workingPeriod.toLowerCase()} required
+							{ad.workingHours} hrs/{ad.workingPeriod.toLowerCase()} required
 						</div>
 					)}
 				</div>
 			</div>
 			<div className="py-1 px-3 text-sm leading-tight flex-grow">
-				{description?.length > 175
-					? description?.slice(0, 175) + "..."
-					: description}
+				{ad.description?.length > 175
+					? ad.description?.slice(0, 175) + "..."
+					: ad.description}
 			</div>
 			<div className="border-t-2 flex items-center justify-between py-1 px-3 text-sm">
 				<div className="overflow-ellipsis overflow-x-hidden whitespace-nowrap flex-grow">
-					{location}
+					{ad.location}
 				</div>
-				{published && <div className="whitespace-nowrap pl-2">{published}</div>}
+				{ad.published && (
+					<div className="whitespace-nowrap pl-2">{ad.published}</div>
+				)}
 			</div>
 		</div>
 	)
