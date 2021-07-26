@@ -13,6 +13,8 @@ import { getWindowSize } from "helpers/getWindowSize"
 import flatList from "helpers/flatList"
 import categories from "data/categories"
 import { Category } from "models/Category"
+import { districts } from "data/districts"
+import { District } from "models/District"
 
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
@@ -83,7 +85,9 @@ const CREATE_AD = gql`
 
 const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [images, setImages] = useState<Array<string | ArrayBuffer>>([])
-	const [list, setList] = useState<string>("")
+	// const [list, setList] = useState<string>("")
+	const [locationListActive, setLocationListActive] = useState<boolean>(false)
+	const [categoryListActive, setCategoryListActive] = useState<boolean>(false)
 
 	const [title, setTitle] = useState<string>("")
 	const [description, setDescription] = useState<string>("")
@@ -106,9 +110,13 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 	const imageInputRef = useRef<HTMLInputElement>()
 
+	const categoryListRef = useRef<HTMLUListElement>(null)
+	const locationListRef = useRef<HTMLUListElement>(null)
+
 	const [userId, setUserId] = useState<string>("")
 
 	const [categoryList, setCategoryList] = useState<Array<Category>>()
+	const [locationList, setLocationList] = useState<Array<District>>()
 
 	const [session, loading] = useSession()
 	const router = useRouter()
@@ -149,6 +157,29 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	}, [loading, uploadingAd, data, width])
 
 	useMemo(() => setCategoryList(flatList(categories)), [categories])
+	useMemo(() => setLocationList(districts), [districts])
+
+	const handleClickOutside = (e) => {
+		if (
+			!categoryListRef?.current?.contains(e.target) &&
+			e.target.id !== "categoryInput"
+		) {
+			setCategoryListActive(false)
+		}
+		if (
+			!locationListRef?.current?.contains(e.target) &&
+			e.target.id !== "locationInput"
+		) {
+			setLocationListActive(false)
+		}
+	}
+
+	useEffect(() => {
+		document.addEventListener("click", handleClickOutside, true)
+		return () => {
+			document.removeEventListener("click", handleClickOutside, true)
+		}
+	}, [])
 
 	const createAd = async () => {
 		if (!images.length) {
@@ -312,7 +343,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 					<textarea
 						name="description"
 						value={description}
-						onFocus={() => setList("")}
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="Provide a detailed description"
 						required
@@ -325,14 +355,15 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 					>
 						Category
 					</label>
-					<span className="relative">
+					<span className="relative" ref={categoryListRef}>
 						<input
 							required
 							type="search"
 							name="category"
 							autoComplete="off"
 							value={category}
-							onFocus={() => setList("category")}
+							id="categoryInput"
+							onFocus={() => setCategoryListActive(true)}
 							onChange={(e) => {
 								setCategoryList(
 									(list) =>
@@ -354,17 +385,17 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
 						/>
 						<ul
-							className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10"
-							style={{ display: list === "category" ? "block" : "none" }}
+							className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10 cursor-pointer"
+							style={{ display: categoryListActive ? "block" : "none" }}
 						>
 							{categoryList?.map((item) => (
 								<li
 									key={item._id}
 									onClick={() => {
 										setCategory(item.name)
-										setList("")
+										setCategoryListActive(false)
 									}}
-									className="px-2 cursor-pointer"
+									className="px-2 border-b border-gray-100 text-sm md:text-base"
 								>
 									{item.name}
 								</li>
@@ -378,49 +409,65 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 					>
 						Location
 					</label>
-					<span className="relative">
+					<span className="relative" ref={locationListRef}>
 						<input
 							type="search"
 							name="location"
 							autoComplete="off"
-							onFocus={() => setList("location")}
 							value={location}
-							onChange={(e) => setLocation(e.target.value)}
+							id="locationInput"
+							onFocus={() => setLocationListActive(true)}
+							onChange={(e) => {
+								setLocationList(
+									(list) =>
+										(list =
+											e.target.value === ""
+												? districts
+												: [
+														...districts.map(({ state, districts: list }) => {
+															const filtered = list.filter((x) =>
+																new RegExp(
+																	`(\w|\s)?${e.target.value}(\w|\s)?`,
+																	"i"
+																).test(x)
+															)
+															return {
+																state: !!filtered.length && state,
+																districts: filtered
+															}
+														})
+												  ])
+								)
+								setLocation(e.target.value)
+							}}
 							placeholder="Select location for Ad"
 							required
 							className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
 						/>
 						<ul
-							className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10"
-							style={{ display: list === "location" ? "block" : "none" }}
+							className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10 cursor-pointer"
+							style={{ display: locationListActive ? "block" : "none" }}
 						>
-							<li
-								onClick={() => {
-									setLocation("Electronics & Smartphones")
-									setList("")
-								}}
-								className="px-2 cursor-pointer"
-							>
-								Electronics &gt; Smartphones
-							</li>
-							<li
-								onClick={() => {
-									setLocation("Jobs & Teacher")
-									setList("")
-								}}
-								className="px-2 cursor-pointer"
-							>
-								Jobs &gt; Teacher
-							</li>
-							<li
-								onClick={() => {
-									setLocation("Water Purifier")
-									setList("")
-								}}
-								className="px-2 cursor-pointer"
-							>
-								Water Purifier
-							</li>
+							{locationList?.map((it: District, index: number) => (
+								<Fragment key={`location-${index + 1}`}>
+									{it.state && (
+										<li className="px-2 font-semibold border-b border-gray-100 text-sm md:text-base">
+											{it.state}
+										</li>
+									)}
+									{it.districts.map((district) => (
+										<li
+											onClick={() => {
+												setLocation(district)
+												setLocationListActive(false)
+											}}
+											className="pl-6 pr-2 border-b border-gray-100 text-sm md:text-base"
+										>
+											{district}
+										</li>
+									))}
+								</Fragment>
+							))}
 						</ul>
 					</span>
 
@@ -440,7 +487,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 									name="workingHours"
 									required={adtype === "Job"}
 									value={workingHours}
-									onFocus={() => setList("")}
 									onChange={(e) => setWorkingHours(e.target.value)}
 									placeholder="Enter Duration"
 									className="flex-grow focus-visible:outline-none"
@@ -476,7 +522,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							max={9e6} // Design fix
 							name="price"
 							value={price}
-							onFocus={() => setList("")}
 							onChange={(e) => setPrice(e.target.value)}
 							placeholder="Enter Amount"
 							className="flex-grow pl-1 focus-visible:outline-none appearance-none"
