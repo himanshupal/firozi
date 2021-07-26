@@ -2,7 +2,7 @@ import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { useSession } from "next-auth/client"
 import Head from "next/head"
-import { Fragment, useState, useRef, useEffect } from "react"
+import { Fragment, useState, useRef, useEffect, useMemo } from "react"
 
 import Modal from "components/Modal"
 import { toast } from "react-toastify"
@@ -10,6 +10,9 @@ import { NextPageContext } from "next"
 import { useRouter } from "next/router"
 import AdCard from "components/Ad"
 import { getWindowSize } from "helpers/getWindowSize"
+import flatList from "helpers/flatList"
+import categories from "data/categories"
+import { Category } from "models/Category"
 
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
@@ -105,6 +108,8 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 	const [userId, setUserId] = useState<string>("")
 
+	const [categoryList, setCategoryList] = useState<Array<Category>>()
+
 	const [session, loading] = useSession()
 	const router = useRouter()
 	const { width } = getWindowSize()
@@ -142,6 +147,8 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		if (loading || uploadingAd || gettingUserAds) setModal(true)
 		else setModal(false)
 	}, [loading, uploadingAd, data, width])
+
+	useMemo(() => setCategoryList(flatList(categories)), [categories])
 
 	const createAd = async () => {
 		if (!images.length) {
@@ -324,9 +331,25 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							type="search"
 							name="category"
 							autoComplete="off"
-							onFocus={() => setList("category")}
 							value={category}
-							onChange={(e) => setCategory(e.target.value)}
+							onFocus={() => setList("category")}
+							onChange={(e) => {
+								setCategoryList(
+									(list) =>
+										(list =
+											e.target.value === ""
+												? flatList(categories)
+												: [
+														...flatList(categories).filter((x) =>
+															new RegExp(
+																`(\w|\s)?${e.target.value}(\w|\s)?`,
+																"i"
+															).test(x.name)
+														)
+												  ])
+								)
+								setCategory(e.target.value)
+							}}
 							placeholder="Select a category"
 							className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
 						/>
@@ -334,33 +357,18 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10"
 							style={{ display: list === "category" ? "block" : "none" }}
 						>
-							<li
-								onClick={() => {
-									setCategory("Electronics & Smartphones")
-									setList("")
-								}}
-								className="px-2 cursor-pointer"
-							>
-								Electronics &gt; Smartphones
-							</li>
-							<li
-								onClick={() => {
-									setCategory("Jobs & Teacher")
-									setList("")
-								}}
-								className="px-2 cursor-pointer"
-							>
-								Jobs &gt; Teacher
-							</li>
-							<li
-								onClick={() => {
-									setCategory("Water Purifier")
-									setList("")
-								}}
-								className="px-2 cursor-pointer"
-							>
-								Water Purifier
-							</li>
+							{categoryList?.map((item) => (
+								<li
+									key={item._id}
+									onClick={() => {
+										setCategory(item.name)
+										setList("")
+									}}
+									className="px-2 cursor-pointer"
+								>
+									{item.name}
+								</li>
+							))}
 						</ul>
 					</span>
 
