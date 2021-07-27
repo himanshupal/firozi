@@ -19,14 +19,15 @@ import "swiper/swiper.scss"
 import "tailwindcss/tailwind.css"
 import "react-toastify/dist/ReactToastify.css"
 import { useEffect } from "react"
+import Loading from "components/Loading"
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 	useEffect(() => {
 		if (process?.env?.NODE_ENV === "development") document.designMode = "on"
 	}, [])
 
-	const [error, modal, setModal] = appState(
-		(state) => [state.error, state.modal, state.setModal],
+	const [error, modal, loading, setModal] = appState(
+		(state) => [state.error, state.modal, state.loading, state.setModal],
 		shallow
 	)
 
@@ -41,13 +42,9 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 
 					<ToastContainer position="bottom-right" />
 
-					{modal && (
-						<Modal
-							title={error || "Loading..."}
-							fixed={!!error}
-							toggle={setModal}
-						/>
-					)}
+					{modal && <Modal title={error} fixed toggle={setModal} />}
+
+					{loading && <Loading message={loading} />}
 				</main>
 			</ApolloProvider>
 		</Provider>

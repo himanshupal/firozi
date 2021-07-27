@@ -51,6 +51,9 @@ const options: NextAuthOptions = {
 			session.user = user
 			return session
 		}
+	},
+	pages: {
+		verifyRequest: "/verify"
 	}
 }
 

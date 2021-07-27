@@ -1,5 +1,7 @@
 import create from "zustand"
 
+type LoadingState = string | boolean
+
 interface AppState {
 	menu: boolean
 	subMenu: boolean
@@ -8,10 +10,10 @@ interface AppState {
 
 	error: string
 	modal: boolean
-	loading: boolean
+	loading: LoadingState
 	setError: (error: string) => void
 	setModal: (modal: boolean) => void
-	setLoading: (loading: boolean) => void
+	setLoading: (loading: LoadingState) => void
 }
 
 export default create<AppState>((set) => ({
@@ -20,8 +22,8 @@ export default create<AppState>((set) => ({
 	loading: false,
 	setError: (error: string) => set((state) => ({ ...state, error })),
 	setModal: (modal: boolean) => set((state) => ({ ...state, modal })),
-	setLoading: (loading: boolean) =>
-		set((state) => ({ ...state, loading, modal: loading && !state.modal })),
+	setLoading: (message: LoadingState) =>
+		set((state) => ({ ...state, loading: message })),
 
 	menu: false,
 	subMenu: false,

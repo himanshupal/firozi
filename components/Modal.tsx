@@ -14,7 +14,7 @@ const Modal = ({
 	fixed = false
 }: ModalProps): JSX.Element => {
 	return (
-		<div className="fixed top-0 h-screen w-screen bg-blood bg-opacity-90 z-50 flex flex-col items-center">
+		<div className="fixed top-0 h-screen w-screen bg-blood bg-opacity-95 z-50 flex flex-col items-center">
 			{!fixed && (
 				<img
 					className="absolute top-2.5 right-3 cursor-pointer"

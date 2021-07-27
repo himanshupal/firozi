@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation } from "@apollo/client"
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { useSession } from "next-auth/client"
 import Head from "next/head"
@@ -6,7 +6,7 @@ import { Fragment, useState, useRef, useEffect, useMemo } from "react"
 
 import Modal from "components/Modal"
 import { toast } from "react-toastify"
-import { NextPageContext } from "next"
+import { GetStaticPaths, GetStaticProps, NextPageContext } from "next"
 import { useRouter } from "next/router"
 import AdCard from "components/Ad"
 import { getWindowSize } from "helpers/getWindowSize"
@@ -15,10 +15,36 @@ import categories from "data/categories"
 import { Category } from "models/Category"
 import { districts } from "data/districts"
 import { District } from "models/District"
+import { Ad as AdModel } from "models/Ad"
 
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
 type Handler = "Buyer" | "Seller"
+
+const AD_DETAILS = gql`
+	query ad($slug: String) {
+		ad(slug: $slug) {
+			description
+			category
+			images
+			price
+			adtype
+			location
+			salaryPeriod
+			workingPeriod
+			offlineOnly
+			offlineOnly
+			workingHours
+			workingPeriod
+			negotiable
+			usedFor
+			condition
+			shippingBy
+			title
+			_id
+		}
+	}
+`
 
 const USERS_ADS = gql`
 	query getUserAds($id: String) {
@@ -83,7 +109,7 @@ const CREATE_AD = gql`
 	}
 `
 
-const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
+const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 	const [images, setImages] = useState<Array<string | ArrayBuffer>>([])
 	const [locationListActive, setLocationListActive] = useState<boolean>(false)
 	const [categoryListActive, setCategoryListActive] = useState<boolean>(false)
@@ -136,8 +162,19 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		}
 	}
 
-	const [getUserAds, { data, loading: gettingUserAds, error }] =
-		useLazyQuery(USERS_ADS)
+	const {
+		data: adData,
+		loading: gettingAdDetails,
+		error: adFetchError
+	} = useQuery<{ ad: AdModel }>(AD_DETAILS, { variables: { slug } })
+
+	console.log(adData)
+
+	const [
+		getUserAds,
+		{ data, loading: gettingUserAds, error: userAdFetchError }
+	] = useLazyQuery(USERS_ADS)
+
 	const [uploadAd, { loading: uploadingAd }] = useMutation(CREATE_AD)
 
 	useEffect(() => {
@@ -148,24 +185,36 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 			// @ts-ignore
 			setUserId(session?.user?.sub)
 			// @ts-ignore
+
 			if (width >= 1024) getUserAds({ variables: { id: session?.user?.sub } })
 		}
 
-		if (loading || uploadingAd || gettingUserAds) setModal(true)
+		if (loading || uploadingAd || gettingAdDetails) setModal(true)
 		else setModal(false)
 	}, [loading, uploadingAd, data, width])
 
-	useMemo(
-		() =>
-			setCategoryList(
-				flatList(
-					categories.filter((x) =>
-						adtype === "Job" ? x.name === "Jobs" : x.name !== "Jobs"
-					)
-				)
-			),
-		[categories]
-	)
+	useEffect(() => {
+		if (adData?.ad) {
+			const { ad } = adData
+			setTitle(ad.title)
+			setDescription(ad.description)
+			setCategory(ad.category)
+			setLocation(ad.location)
+			setPrice(ad.price.toString())
+			setUsedFor(ad.usedFor)
+			setWorkingHours(ad.workingHours)
+			setWorkingPeriod(ad.workingPeriod)
+			setSalaryPeriod(ad.salaryPeriod)
+			setAdtype(ad.adtype as Ad)
+			setNegotiable(ad.negotiable)
+			setOfflineOnly(ad.offlineOnly)
+			setCondition(ad.condition as Condition)
+			setDescription(ad.description)
+		}
+		setModal(false)
+	}, [adData])
+
+	useMemo(() => setCategoryList(flatList(categories)), [categories])
 	useMemo(() => setLocationList(districts), [districts])
 
 	const handleClickOutside = (e) => {
@@ -720,7 +769,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 									key={`ad-${index + 1}`}
 								/>
 							))}
-
 					<div className="pt-4">
 						{gettingUserAds
 							? `Loading Ads...`
@@ -746,9 +794,15 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 export default CreateAd
 
-export const getStaticProps = (context: NextPageContext) => ({
+export const getStaticProps: GetStaticProps = ({ params }) => ({
 	props: {
 		cloudinaryUrl: process.env.CLOUDINARY_URL,
-		cloudinarySecret: process.env.CLOUDINARY_SECRET
+		cloudinarySecret: process.env.CLOUDINARY_SECRET,
+		slug: params.ad
 	}
+})
+
+export const getStaticPaths: GetStaticPaths = async () => ({
+	paths: [],
+	fallback: "blocking"
 })

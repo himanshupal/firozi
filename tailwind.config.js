@@ -8,7 +8,8 @@ module.exports = {
 				sans: ["Sen", "sans-serif"]
 			},
 			colors: {
-				blood: "#364ac5"
+				blood: "#364ac5",
+				rust: "#67000c"
 			},
 			height: {
 				content: "calc(100vh - 52px)"

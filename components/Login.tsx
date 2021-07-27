@@ -9,7 +9,6 @@ interface LoginProps {
 
 const Login = ({ toggle }: LoginProps): JSX.Element => {
 	const email = useRef<HTMLInputElement>()
-	const password = useRef<HTMLInputElement>()
 
 	return (
 		<Modal title="Login" toggle={toggle}>
@@ -60,11 +59,12 @@ const Login = ({ toggle }: LoginProps): JSX.Element => {
 			<form
 				onSubmit={async (e) => {
 					e.preventDefault()
-					await signIn("email", { email: email.current.value })
+					signIn("email", { email: email.current.value })
 				}}
 			>
 				<input
 					ref={email}
+					autoFocus={true}
 					aria-label="Email Address"
 					placeholder="Enter your email address"
 					className="h-8 my-2 px-2 border-2 border-blood focus-visible:outline-none"

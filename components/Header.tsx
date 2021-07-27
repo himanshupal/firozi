@@ -1,34 +1,69 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 
-import { signOut, useSession } from "next-auth/client"
-import { gql, useLazyQuery } from "@apollo/client"
 import { Fragment, useEffect, useRef, useState } from "react"
+import { signOut, useSession } from "next-auth/client"
+import { useLazyQuery } from "@apollo/client"
 
 import appState from "store/state"
+import userState from "store/user"
 import shallow from "zustand/shallow"
 
 import Menu from "components/Menu"
 import Login from "components/Login"
 
-const GET_AVATAR = gql`
-	query getUser($id: String!) {
-		user(_id: $id) {
-			_id
-			avatar
-		}
-	}
-`
+import GET_AVATAR from "queries/getAvatar"
+
+import { User } from "models/User"
+import { icon } from "helpers/getImage"
+import Loading from "./Loading"
 
 const Header = (): JSX.Element => {
-	const [menu, subMenu, setMenu, setSubMenu] = appState(
-		(state) => [state.menu, state.subMenu, state.setMenu, state.setSubMenu],
+	const [session, sessionLoading] = useSession()
+
+	const [getUserAvatar, { data: userData, loading, error: fetchError }] =
+		useLazyQuery<{ user: User }>(GET_AVATAR)
+
+	const [menu, subMenu, setMenu, setSubMenu, setLoading] = appState(
+		(state) => [
+			state.menu,
+			state.subMenu,
+			state.setMenu,
+			state.setSubMenu,
+			state.setLoading
+		],
 		shallow
 	)
 
-	const [session, loading] = useSession()
+	const [profileIcon, setProfileIcon] = useState<string>("")
+
+	const [userId, avatar, setUserId, setUserAvatar, purge] = userState(
+		(state) => [
+			state.userId,
+			state.avatar,
+			state.setUserId,
+			state.setUserAvatar,
+			state.purgeUserDetails
+		],
+		shallow
+	)
+
+	useEffect(() => {
+		if (!userId && session?.user) {
+			getUserAvatar({
+				// @ts-ignore
+				variables: { id: session?.user?.sub }
+			})
+		}
+		if (userData?.user) {
+			setUserAvatar(icon(userData?.user?.avatar))
+			setUserId(userData?.user?._id?.toString())
+		}
+
+		if (avatar) setProfileIcon(avatar)
+	}, [session, userData, avatar])
+
 	const [login, setLogin] = useState<Boolean>(false)
-	const [avatar, setAvatar] = useState<string>("")
 
 	const menuRef = useRef<HTMLDivElement>(null)
 	const subMenuRef = useRef<HTMLDivElement>(null)
@@ -44,27 +79,13 @@ const Header = (): JSX.Element => {
 	const routes = [
 		{
 			text: "My Ads",
-			// @ts-ignore
-			path: `/u/${session?.user?.sub}/ads`
+			path: `/u/${userId}/ads`
 		}
 	]
 
 	const location = Object.keys(routeMap).includes(router.pathname)
 		? routeMap[router.pathname]
 		: routeMap["/"]
-
-	const [getUser, { data }] = useLazyQuery(GET_AVATAR)
-
-	useEffect(() => {
-		// @ts-ignore
-		if (session && !data) getUser({ variables: { id: session?.user?.sub } })
-		if (data) {
-			if (data?.user?.avatar)
-				setAvatar(
-					data.user.avatar.replace(/upload/, "upload/c_limit,h_50,q_33,w_50")
-				)
-		}
-	}, [session, data])
 
 	const handleClickOutside = (e) => {
 		if (!menuRef?.current?.contains(e.target) && e.target.id !== "menuToggle") {
@@ -81,10 +102,14 @@ const Header = (): JSX.Element => {
 
 	useEffect(() => {
 		document.addEventListener("click", handleClickOutside, true)
-		return () => {
-			document.removeEventListener("click", handleClickOutside, true)
-		}
+		return () => document.removeEventListener("click", handleClickOutside, true)
 	}, [])
+
+	useEffect(() => {
+		if (sessionLoading) setLoading(true)
+		else if (loading) setLoading("Loading Profile Details")
+		else setLoading(false)
+	}, [loading, sessionLoading])
 
 	return (
 		<Fragment>
@@ -116,15 +141,14 @@ const Header = (): JSX.Element => {
 					/>
 					<img
 						className={
-							avatar
+							!!profileIcon
 								? `rounded-full cursor-pointer border-2 border-white`
-								: `rounded-full cursor-pointer`
+								: `rounded-full cursor-pointer bg-white`
 						}
 						width="30"
 						height="30"
 						id="subMenuToggle"
-						alt="Profile Icon"
-						src={avatar || "/icons/profile.svg"}
+						src={profileIcon || `/icons/${session ? "profile" : "key"}.svg`}
 						onClick={() =>
 							session ? setSubMenu(!subMenu) : setLogin((login) => !login)
 						}
@@ -137,8 +161,7 @@ const Header = (): JSX.Element => {
 					className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 m-2 z-10"
 					ref={subMenuRef}
 				>
-					{/* @ts-ignore */}
-					<Link href={`/u/${session?.user?.sub}`} passHref>
+					<Link href={`/u/${userId}`} passHref>
 						<div className="cursor-pointer my-1 px-6">Profile</div>
 					</Link>
 					{routes.map(({ path, text }, index) => (
@@ -148,7 +171,10 @@ const Header = (): JSX.Element => {
 					))}
 					<div
 						className="cursor-pointer my-1 px-6"
-						onClick={async () => await signOut()}
+						onClick={() => {
+							signOut()
+							purge()
+						}}
 					>
 						Logout
 					</div>
