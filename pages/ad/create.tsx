@@ -455,13 +455,14 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 											{it.state}
 										</li>
 									)}
-									{it.districts.map((district) => (
+									{it.districts.map((district, dIndex) => (
 										<li
 											onClick={() => {
 												setLocation(district)
 												setLocationListActive(false)
 											}}
 											className="pl-6 pr-2 border-b border-gray-100 text-sm md:text-base"
+											key={`district-${dIndex + 1}`}
 										>
 											{district}
 										</li>
