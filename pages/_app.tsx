@@ -20,16 +20,24 @@ import "tailwindcss/tailwind.css"
 import "react-toastify/dist/ReactToastify.css"
 import { useEffect } from "react"
 import Loading from "components/Loading"
+import computed from "store/computed"
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
-	useEffect(() => {
-		if (process?.env?.NODE_ENV === "development") document.designMode = "on"
-	}, [])
+	const [categories, setCategories] = computed(
+		(state) => [state.categories, state.setCategories],
+		shallow
+	)
 
 	const [error, modal, loading, setModal] = appState(
 		(state) => [state.error, state.modal, state.loading, state.setModal],
 		shallow
 	)
+
+	useEffect(() => {
+		if (process?.env?.NODE_ENV === "development") document.designMode = "on"
+
+		if (!categories) setCategories("Product")
+	}, [])
 
 	return (
 		<Provider session={pageProps.session}>

@@ -16,7 +16,6 @@ import GET_AVATAR from "queries/getAvatar"
 
 import { User } from "models/User"
 import { icon } from "helpers/getImage"
-import Loading from "./Loading"
 
 const Header = (): JSX.Element => {
 	const [session, sessionLoading] = useSession()
@@ -35,7 +34,9 @@ const Header = (): JSX.Element => {
 		shallow
 	)
 
+	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [profileIcon, setProfileIcon] = useState<string>("")
+	const [inputPlaceholder, setInputPlaceholder] = useState<string>("Search")
 
 	const [userId, avatar, setUserId, setUserAvatar, purge] = userState(
 		(state) => [
@@ -127,23 +128,45 @@ const Header = (): JSX.Element => {
 					</Link>
 				</div>
 				<div className="flex items-center gap-5">
-					<input
-						name="search"
-						type="search"
-						placeholder="Search"
-						className="hidden md:block w-full px-2 h-8 text-blood"
-					/>
-
-					<select
-						name="location"
-						placeholder="Location"
-						className="hidden md:block w-full px-2 h-8 text-blood appearance-none"
+					<form
+						onSubmit={(e) => {
+							e.preventDefault()
+							console.log(searchQuery)
+						}}
+						className="hidden md:flex w-full lg:w-72 px-2 h-8 text-blood"
 					>
-						<option value="priceInc">Price: Low to High</option>
-						<option value="priceDec">Price: High to Low</option>
-						<option value="postNew">Most Recent</option>
-						<option value="postOld">Oldest First</option>
-					</select>
+						<span className="bg-white w-8 h-8 flex items-center justify-center">
+							<img src="/icons/search.svg" alt="Search Icon" />
+						</span>
+						<input
+							name="search"
+							type="search"
+							value={searchQuery}
+							placeholder={inputPlaceholder}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							onFocus={() => setInputPlaceholder("Press Enter to Search")}
+							onBlur={() => setInputPlaceholder("Search")}
+							className="w-full px-2 h-8"
+						/>
+						<button type="submit" style={{ display: "none" }} />
+					</form>
+
+					<div className="hidden md:flex w-full lg:w-72 px-2 h-8 text-blood">
+						<span className="bg-white w-8 h-8 flex items-center justify-center">
+							<img src="/icons/location.svg" alt="Search Icon" />
+						</span>
+						<select
+							name="location"
+							placeholder="Location"
+							className="hidden md:block w-full lg:w-72 px-2 h-8 text-blood appearance-none"
+						>
+							<option value="priceInc">Price: Low to High</option>
+							<option value="priceDec">Price: High to Low</option>
+							<option value="postNew">Most Recent</option>
+							<option value="postOld">Oldest First</option>
+						</select>
+					</div>
+
 					<img
 						className={
 							!!profileIcon

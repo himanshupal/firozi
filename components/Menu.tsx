@@ -6,6 +6,8 @@ import "rc-slider/assets/index.css"
 const Menu = ({ reference }): JSX.Element => {
 	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })
 
+	const [filter, setFilter] = useState<Array<string>>()
+
 	return (
 		<div
 			className="h-content flex flex-col overflow-auto bg-blood absolute top-header z-10 min-w-full md:min-w-max md:w-1/4"
@@ -19,7 +21,12 @@ const Menu = ({ reference }): JSX.Element => {
 					>
 						Search
 					</label>
-					<input name="search" className="w-full px-2 h-8" />
+					<div className="flex">
+						<span className="bg-white w-8 h-8 flex items-center justify-center">
+							<img src="/icons/search.svg" alt="Search Icon" />
+						</span>
+						<input name="search" type="search" className="w-full px-2 h-8" />
+					</div>
 				</div>
 				<div className="pb-3 px-8">
 					<label
@@ -28,7 +35,12 @@ const Menu = ({ reference }): JSX.Element => {
 					>
 						Location
 					</label>
-					<input name="location" className="w-full px-2 h-8" />
+					<div className="flex">
+						<span className="bg-white w-8 h-8 flex items-center justify-center">
+							<img src="/icons/location.svg" alt="Location Icon" />
+						</span>
+						<input name="location" type="search" className="w-full px-2 h-8" />
+					</div>
 				</div>
 			</div>
 
