@@ -1,71 +1,43 @@
-// @ts-nocheck
-
 import Head from "next/head"
 import { GetStaticPaths, NextPageContext } from "next"
 import { useRouter } from "next/router"
-
-import { useSession } from "next-auth/client"
-import { Fragment, useState, useRef, useEffect } from "react"
-import { gql, useMutation, useLazyQuery } from "@apollo/client"
+import { Fragment, useState, useRef, useEffect, useMemo } from "react"
+import { useMutation, useLazyQuery } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { toast } from "react-toastify"
-import Loading from "components/Loading"
 import Modal from "components/Modal"
+
+import { districts } from "data/districts"
+import { District } from "models/District"
+
+import userState from "store/user"
+import appState from "store/state"
+
 const nameRegex = /[\sa-zA-Z]+/
 const contactRegex = /[\+\-0-9]+/
 
-const USER_DETAILS = gql`
-	query getUser($id: String!) {
-		user(_id: $id) {
-			_id
-			name
-			email
-			avatar
-			contact
-			location
-			hidden
-		}
-	}
-`
-
-const UPDATE_USER = gql`
-	mutation (
-		$id: ID
-		$name: String
-		$email: String
-		$avatar: String
-		$contact: String
-		$hidden: Boolean
-		$location: String
-	) {
-		updateUser(
-			id: $id
-			name: $name
-			email: $email
-			avatar: $avatar
-			hidden: $hidden
-			contact: $contact
-			location: $location
-		)
-	}
-`
+import { USER_DETAILS, UPDATE_USER } from "queries/user"
 
 const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
-	const [session, loading] = useSession()
 	const router = useRouter()
 
-	const [privateUser, setPrivateUser] = useState<Boolean>(false)
-	const [image, setImage] = useState<string | ArrayBuffer>("")
-	const [list, setList] = useState<string>("")
-	const [location, setLocation] = useState<string>("")
+	const userId = userState((state) => state.userId)
+	const setLoading = appState((state) => state.setLoading)
+
 	const [toUpload, setToUpload] = useState<boolean>(false) // Will check if the image is uploaded now or is being used from state
-	const [uploadingImage, setUploadingImage] = useState<boolean>(false) // Will toggle as image upload starts & finishes
 
 	const imageInputRef = useRef<HTMLInputElement>()
+	const locationListRef = useRef<HTMLUListElement>(null)
+
+	const [locationList, setLocationList] = useState<Array<District>>()
+	const [locationListActive, setLocationListActive] = useState<boolean>(false)
 
 	const [name, setName] = useState<string>("")
 	const [email, setEmail] = useState<string>("")
+	const [image, setImage] = useState<string | ArrayBuffer>("")
 	const [contact, setContact] = useState<string>("")
+	const [location, setLocation] = useState<string>("")
+	const [hidden, setHidden] = useState<Boolean>(false)
 
 	const [updateUser, { loading: updating, error: updateError }] =
 		useMutation(UPDATE_USER)
@@ -86,7 +58,7 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	}
 
 	useEffect(() => {
-		if (session && !data) getUser({ variables: { id: session?.user?.sub } })
+		if (userId && !data) getUser({ variables: { id: userId } })
 
 		if (data?.user) {
 			setName(data?.user?.name)
@@ -94,20 +66,28 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 			setImage(data?.user?.avatar)
 			setContact(data?.user?.contact)
 			setLocation(data?.user?.location)
-			setPrivateUser(data?.user?.hidden)
+			setHidden(data?.user?.hidden)
 		}
-	}, [session, data])
+
+		if (data) setLoading(false)
+	}, [userId, data])
+
+	useEffect(() => {
+		if (fetchingUser) setLoading("Getting Profile Details")
+		if (updating) setLoading("Saving Profile")
+		return () => setLoading(false)
+	}, [data, fetchingUser, updating])
 
 	const updateProfile = async () => {
 		let avatar
 
 		if (image && toUpload) {
-			setUploadingImage(true)
+			setLoading("Uploading Image")
 
 			const body = new FormData()
 			body.append("file", image.toString())
 			body.append("upload_preset", cloudinarySecret)
-			body.append("tags", `firozi, user_images, ${session?.user?.sub}`)
+			body.append("tags", `firozi, user_images, ${userId}`)
 
 			const res = await fetch(cloudinaryUrl, {
 				method: "POST",
@@ -117,41 +97,44 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 			const { url } = await res.json()
 			avatar = url
 
-			setUploadingImage(false)
+			setLoading(false)
 		} else {
 			avatar = image
 		}
 
-		const { data } = await updateUser({
+		await updateUser({
 			variables: filter({
-				id: session.user.sub,
+				id: userId,
 				name,
 				email,
+				avatar,
 				contact,
 				location,
-				avatar,
-				hidden: privateUser
-			})
+				hidden
+			}),
+			update: (_, { data }) => {
+				if (data?.updateUser?._id) toast.success("Profile Updated!")
+			}
 		})
-
-		if (data?.updateUser) toast.success("Profile Updated!")
 	}
 
-	if (loading) {
-		return <Loading />
+	useMemo(() => setLocationList(districts), [districts])
+
+	const handleClickOutside = (e) => {
+		if (
+			!locationListRef?.current?.contains(e.target) &&
+			e.target.id !== "locationInput"
+		) {
+			setLocationListActive(false)
+		}
 	}
 
-	if (fetchingUser) {
-		return <Loading message="Getting Profile Details" />
-	}
-
-	if (uploadingImage) {
-		return <Loading message="Uploading Image" />
-	}
-
-	if (updating) {
-		return <Loading message="Saving Profile" />
-	}
+	useEffect(() => {
+		document.addEventListener("click", handleClickOutside, true)
+		return () => {
+			document.removeEventListener("click", handleClickOutside, true)
+		}
+	}, [])
 
 	if (error || updateError) {
 		return <Modal title={error?.networkError?.name || error.message} fixed />
@@ -254,7 +237,6 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 								}
 								value={contact}
 								onChange={(e) => setContact(e.target.value)}
-								onFocus={() => setList("")} // In case user is navigating through KBD & field is not accessible
 								placeholder="Your mobile number"
 								className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
 							/>
@@ -263,74 +245,92 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 								htmlFor="location"
 								className="block text-blood pb-1 pl-2 text-lg md:text-xl font-cursive"
 							>
-								Primary Location
+								Location
 							</label>
-							<span className="relative">
+							<span className="relative" ref={locationListRef}>
 								<input
 									type="search"
 									name="location"
 									autoComplete="off"
-									onFocus={() => setList("location")}
 									value={location}
-									onChange={(e) => setLocation(e.target.value)}
+									id="locationInput"
+									onFocus={() => setLocationListActive(true)}
+									onChange={(e) => {
+										setLocationList(
+											(list) =>
+												(list =
+													e.target.value === ""
+														? districts
+														: [
+																...districts.map(
+																	({ state, districts: list }) => {
+																		const filtered = list.filter((x) =>
+																			new RegExp(
+																				`(\w|\s)?${e.target.value}(\w|\s)?`,
+																				"i"
+																			).test(x)
+																		)
+																		return {
+																			state: !!filtered.length && state,
+																			districts: filtered
+																		}
+																	}
+																)
+														  ])
+										)
+										setLocation(e.target.value)
+									}}
 									placeholder="Select your primary location"
+									required
 									className="border-blood border-2 mb-3 w-full px-2 h-8 focus-visible:outline-none text-gray-600"
 								/>
 								<ul
-									className="absolute max-h-60 min-h-0 left-0 top-6 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10"
-									style={{ display: list === "location" ? "block" : "none" }}
+									className="absolute max-h-60 min-h-0 left-0 top-8 bg-white text-blood overflow-auto w-full border-2 border-blood border-t-0 z-10 cursor-pointer"
+									style={{ display: locationListActive ? "block" : "none" }}
 								>
-									<li
-										onClick={() => {
-											setLocation("Electronics > Smartphones")
-											setList("")
-										}}
-										className="px-2 cursor-pointer"
-									>
-										Electronics &gt; Smartphones
-									</li>
-									<li
-										onClick={() => {
-											setLocation("Jobs > Teacher")
-											setList("")
-										}}
-										className="px-2 cursor-pointer"
-									>
-										Jobs &gt; Teacher
-									</li>
-									<li
-										onClick={() => {
-											setLocation("Water Purifier")
-											setList("")
-										}}
-										className="px-2 cursor-pointer"
-									>
-										Water Purifier
-									</li>
+									{locationList?.map((it: District, index: number) => (
+										<Fragment key={`location-${index + 1}`}>
+											{it.state && (
+												<li className="px-2 font-semibold border-b border-gray-100 text-sm md:text-base">
+													{it.state}
+												</li>
+											)}
+											{it.districts.map((district, dIndex) => (
+												<li
+													onClick={() => {
+														setLocation(district)
+														setLocationListActive(false)
+													}}
+													className="pl-6 pr-2 border-b border-gray-100 text-sm md:text-base"
+													key={`district-${dIndex + 1}`}
+												>
+													{district}
+												</li>
+											))}
+										</Fragment>
+									))}
 								</ul>
 							</span>
 
 							<label
-								htmlFor="privateUser"
+								htmlFor="hidden"
 								className="text-blood pb-1 pl-2 text-lg md:text-xl font-cursive"
 							>
 								Profile hidden
 							</label>
 							<div
 								tabIndex={0}
-								onFocus={() => setList("")}
-								onClick={() => setPrivateUser((privateUser) => !privateUser)}
+								onClick={() => setHidden((hidden) => !hidden)}
 								onKeyPress={(e) =>
-									e.code === "Space" &&
-									setPrivateUser((privateUser) => !privateUser)
+									e.code === "Space" && setHidden((hidden) => !hidden)
 								}
 								className={
-									privateUser
+									hidden
 										? `h-8 w-20 rounded-full mb-3 bg-blood text-xs flex items-center justify-center text-white cursor-pointer`
 										: `h-8 w-20 rounded-full mb-3 border-2 border-blood text-xs flex items-center justify-center text-blood cursor-pointer`
 								}
 							>
-								{privateUser ? "Yes" : "No"}
+								{hidden ? "Yes" : "No"}
 							</div>
 
 							<button

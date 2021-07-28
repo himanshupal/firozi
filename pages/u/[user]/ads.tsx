@@ -7,6 +7,8 @@ import AdCard from "components/Ad"
 import appState from "store/state"
 import shallow from "zustand/shallow"
 
+import { AD_CORE_FIELDS_FRAGMENT } from "queries/ads"
+
 import { Swiper, SwiperSlide } from "swiper/react"
 import SwiperCore, { Navigation } from "swiper/core"
 
@@ -16,29 +18,12 @@ import "swiper/components/pagination/pagination.min.css"
 
 SwiperCore.use([Navigation])
 
-const AD_FRAGMENT = gql`
-	fragment AdCoreFields on Ad {
-		_id
-		slug
-		price
-		title
-		adtype
-		category
-		location
-		negotiable
-		description
-		images
-		createdBy {
+const USER_ADS = gql`
+	${AD_CORE_FIELDS_FRAGMENT}
+	query UserAds($user: ID) {
+		user(_id: $user) {
 			_id
 			name
-		}
-	}
-`
-
-const USER_ADS = gql`
-	${AD_FRAGMENT}
-	query UserAds($user: String) {
-		user(_id: $user) {
 			published: ads(limit: 3) {
 				...AdCoreFields
 			}

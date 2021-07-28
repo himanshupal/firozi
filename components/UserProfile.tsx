@@ -1,5 +1,7 @@
+import { profile } from "helpers/getImage"
 import { User } from "models/User"
 import { useRouter } from "next/router"
+
 interface UserProfile {
 	userDetails: User
 }
@@ -20,7 +22,7 @@ const UserProfile = ({ userDetails }: UserProfile): JSX.Element => {
 			{userDetails["avatar"] && (
 				<img
 					className="w-44 h-44 rounded-full object-cover"
-					src={userDetails["avatar"]}
+					src={profile(userDetails["avatar"])}
 					alt="User Avatar"
 				/>
 			)}

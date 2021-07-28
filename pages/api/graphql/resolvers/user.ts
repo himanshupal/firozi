@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { Collection, MongoClient, ObjectId } from "mongodb"
 
 import { getCollection, getClient } from "helpers/dbclient"

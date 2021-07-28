@@ -14,6 +14,8 @@ import { User } from "models/User"
 import store from "store"
 import Modal from "components/Modal"
 
+import { AD_CORE_FIELDS_FRAGMENT } from "queries/ads"
+
 interface HomeProps {
 	ads: Array<Ad>
 	user: User
@@ -84,22 +86,15 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
 		error
 	} = await client.query({
 		query: gql`
-			query ads($userId: String) {
+			${AD_CORE_FIELDS_FRAGMENT}
+			query ads($userId: ID!) {
 				ads {
-					_id
-					title
-					slug
-					description
-					images
-					price
-					adtype
+					...AdCoreFields
 					condition
-					negotiable
 					workingHours
 					offlineOnly
 					workingPeriod
 					salaryPeriod
-					location
 				}
 				user(_id: $userId) {
 					_id

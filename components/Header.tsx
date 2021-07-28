@@ -108,7 +108,7 @@ const Header = (): JSX.Element => {
 	useEffect(() => {
 		if (sessionLoading) setLoading(true)
 		else if (loading) setLoading("Loading Profile Details")
-		else setLoading(false)
+		return () => setLoading(false)
 	}, [loading, sessionLoading])
 
 	return (
@@ -133,12 +133,17 @@ const Header = (): JSX.Element => {
 						placeholder="Search"
 						className="hidden md:block w-full px-2 h-8 text-blood"
 					/>
-					<input
+
+					<select
 						name="location"
-						type="search"
 						placeholder="Location"
-						className="hidden md:block w-full px-2 h-8 text-blood"
-					/>
+						className="hidden md:block w-full px-2 h-8 text-blood appearance-none"
+					>
+						<option value="priceInc">Price: Low to High</option>
+						<option value="priceDec">Price: High to Low</option>
+						<option value="postNew">Most Recent</option>
+						<option value="postOld">Oldest First</option>
+					</select>
 					<img
 						className={
 							!!profileIcon

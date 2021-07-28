@@ -6,7 +6,7 @@ import { Ad } from "./ad"
 
 const Query: DocumentNode = gql`
 	type Query {
-		user(_id: String, email: String): User
+		user(_id: ID, email: String): User
 		ads(skip: Int, limit: Int): [Ad]
 		ad(slug: String): Ad
 	}
@@ -17,9 +17,9 @@ const Query: DocumentNode = gql`
 			email: String
 			avatar: String
 			contact: String
-			hidden: Boolean
 			location: String
-		): Boolean
+			hidden: Boolean
+		): User
 
 		createAd(
 			title: String
