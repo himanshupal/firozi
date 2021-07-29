@@ -39,7 +39,7 @@ const Home = (): JSX.Element => {
 	}>(
 		gql`
 			${AD_CORE_FIELDS_FRAGMENT}
-			query ads($userId: ID!, $searchTerm: String) {
+			query ads($userId: ID, $searchTerm: String) {
 				ads(filter: $searchTerm) {
 					...AdCoreFields
 					condition
@@ -54,14 +54,14 @@ const Home = (): JSX.Element => {
 				}
 			}
 		`,
-		{ variables: { userId, searchTerm } }
+		{ variables: { userId: userId || null, searchTerm } }
 	)
 
 	useEffect(() => replaceSaved(data?.user?.saved), [data?.user])
 
 	useEffect(() => {
 		getAds()
-		if (loading) setLoading("Searching Ads")
+		if (loading) setLoading("Loading Ads")
 		else setLoading(false)
 	}, [searchTerm, loading])
 
