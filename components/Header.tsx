@@ -7,6 +7,7 @@ import { useLazyQuery } from "@apollo/client"
 
 import appState from "store/state"
 import userState from "store/user"
+import filterState from "store/filter"
 import shallow from "zustand/shallow"
 
 import Menu from "components/Menu"
@@ -34,7 +35,6 @@ const Header = (): JSX.Element => {
 		shallow
 	)
 
-	const [searchQuery, setSearchQuery] = useState<string>("")
 	const [profileIcon, setProfileIcon] = useState<string>("")
 	const [inputPlaceholder, setInputPlaceholder] = useState<string>("Search")
 
@@ -45,6 +45,23 @@ const Header = (): JSX.Element => {
 			state.setUserId,
 			state.setUserAvatar,
 			state.purgeUserDetails
+		],
+		shallow
+	)
+
+	const [
+		searchQuery,
+		setSearchQuery,
+		locationQuery,
+		setLocationQuery,
+		setSearchTerm
+	] = filterState(
+		(state) => [
+			state.search,
+			state.setSearch,
+			state.location,
+			state.setLocation,
+			state.setSearchTerm
 		],
 		shallow
 	)
@@ -131,7 +148,7 @@ const Header = (): JSX.Element => {
 					<form
 						onSubmit={(e) => {
 							e.preventDefault()
-							console.log(searchQuery)
+							setSearchTerm(searchQuery)
 						}}
 						className="hidden md:flex w-full lg:w-72 px-2 h-8 text-blood"
 					>

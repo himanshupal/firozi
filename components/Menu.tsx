@@ -1,12 +1,31 @@
 import { Range } from "rc-slider"
 import { useState } from "react"
 
+import shallow from "zustand/shallow"
+import filterState from "store/filter"
+
 import "rc-slider/assets/index.css"
 
 const Menu = ({ reference }): JSX.Element => {
 	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })
+	const [inputPlaceholder, setInputPlaceholder] = useState<string>("Search")
 
-	const [filter, setFilter] = useState<Array<string>>()
+	const [
+		searchQuery,
+		setSearchQuery,
+		locationQuery,
+		setLocationQuery,
+		setSearchTerm
+	] = filterState(
+		(state) => [
+			state.search,
+			state.setSearch,
+			state.location,
+			state.setLocation,
+			state.setSearchTerm
+		],
+		shallow
+	)
 
 	return (
 		<div
@@ -25,7 +44,26 @@ const Menu = ({ reference }): JSX.Element => {
 						<span className="bg-white w-8 h-8 flex items-center justify-center">
 							<img src="/icons/search.svg" alt="Search Icon" />
 						</span>
-						<input name="search" type="search" className="w-full px-2 h-8" />
+
+						<form
+							onSubmit={(e) => {
+								e.preventDefault()
+								setSearchTerm(searchQuery)
+							}}
+							className="w-full"
+						>
+							<input
+								name="search"
+								type="search"
+								value={searchQuery}
+								className="w-full px-2 h-8"
+								placeholder={inputPlaceholder}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								onFocus={() => setInputPlaceholder("Press Enter to Search")}
+								onBlur={() => setInputPlaceholder("Search")}
+							/>
+							<button type="submit" style={{ display: "none" }} />
+						</form>
 					</div>
 				</div>
 				<div className="pb-3 px-8">

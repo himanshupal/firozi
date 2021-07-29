@@ -1,17 +1,17 @@
 import Head from "next/head"
-import { NextPageContext } from "next"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useState } from "react"
-import { getSession } from "next-auth/client"
 
 import { Ad } from "models/Ad"
 import AdCard from "components/Ad"
 import Login from "components/Login"
-import client from "helpers/apolloclient"
-import { gql } from "@apollo/client"
+import { gql, useLazyQuery } from "@apollo/client"
 import { User } from "models/User"
 
 import store from "store"
+import appState from "store/state"
+import userState from "store/user"
+import filterState from "store/filter"
 import Modal from "components/Modal"
 
 import { AD_CORE_FIELDS_FRAGMENT } from "queries/ads"
@@ -23,14 +23,49 @@ interface HomeProps {
 	userId: string
 }
 
-const Home = ({ ads, user, userId, error }: HomeProps): JSX.Element => {
+const Home = (): JSX.Element => {
 	const [login, setLogin] = useState<boolean>(false)
 
 	const replaceSaved = store((state) => state.replaceSaved)
+	const userId = userState((state) => state.userId)
+	const setLoading = appState((state) => state.setLoading)
+	const searchTerm = filterState((state) => state.searchTerm)
 
 	const router = useRouter()
 
-	useEffect(() => replaceSaved(user?.saved), [user])
+	const [getAds, { data, loading, error }] = useLazyQuery<{
+		user: User
+		ads: Array<Ad>
+	}>(
+		gql`
+			${AD_CORE_FIELDS_FRAGMENT}
+			query ads($userId: ID!, $searchTerm: String) {
+				ads(filter: $searchTerm) {
+					...AdCoreFields
+					condition
+					workingHours
+					offlineOnly
+					workingPeriod
+					salaryPeriod
+				}
+				user(_id: $userId) {
+					_id
+					saved
+				}
+			}
+		`,
+		{ variables: { userId, searchTerm } }
+	)
+
+	useEffect(() => replaceSaved(data?.user?.saved), [data?.user])
+
+	useEffect(() => {
+		getAds()
+		if (loading) setLoading("Searching Ads")
+		else setLoading(false)
+	}, [searchTerm, loading])
+
+	useEffect(() => getAds(), [])
 
 	return (
 		<Fragment>
@@ -38,7 +73,7 @@ const Home = ({ ads, user, userId, error }: HomeProps): JSX.Element => {
 				<title>Ads | Firozi</title>
 			</Head>
 
-			{error && <Modal title={error} fixed />}
+			{error && <Modal title={error?.message} fixed />}
 
 			<button
 				onClick={() =>
@@ -55,9 +90,9 @@ const Home = ({ ads, user, userId, error }: HomeProps): JSX.Element => {
 				/>
 				<div>New Ad</div>
 			</button>
-			{ads?.length ? (
+			{data?.ads?.length ? (
 				<div className="bricks p-4 text-center gap-4">
-					{ads.map((ad: Ad, index: number) => (
+					{data?.ads.map((ad: Ad, index: number) => (
 						<AdCard ad={ad} userId={userId} key={`ad-${index + 1}`} />
 					))}
 				</div>
@@ -74,36 +109,3 @@ const Home = ({ ads, user, userId, error }: HomeProps): JSX.Element => {
 	)
 }
 export default Home
-
-export const getServerSideProps = async ({ req }: NextPageContext) => {
-	const session = await getSession({ req })
-
-	// @ts-ignore
-	const userId = session?.user?.sub || null
-
-	const {
-		data: { ads, user },
-		error
-	} = await client.query({
-		query: gql`
-			${AD_CORE_FIELDS_FRAGMENT}
-			query ads($userId: ID!) {
-				ads {
-					...AdCoreFields
-					condition
-					workingHours
-					offlineOnly
-					workingPeriod
-					salaryPeriod
-				}
-				user(_id: $userId) {
-					_id
-					saved
-				}
-			}
-		`,
-		variables: { userId }
-	})
-
-	return { props: { ads, user, userId, error: error?.message || null } }
-}
