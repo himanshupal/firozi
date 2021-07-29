@@ -7,7 +7,7 @@ import { User } from "models/User"
 
 const getAds = async (
 	user: User,
-	{ limit = 0, skip = 0, filter = "" }: Arguments
+	{ limit = 0, skip = 0, filter = "", location = "" }: Arguments
 ): Promise<Array<Ad>> => {
 	const client: MongoClient = await getClient()
 
@@ -18,9 +18,13 @@ const getAds = async (
 			user
 				? {
 						createdBy: { _id: user?._id },
-						title: { $regex: filter, $options: "i" }
+						title: { $regex: filter, $options: "i" },
+						location: { $regex: location, $options: "i" }
 				  }
-				: { title: { $regex: filter, $options: "i" } }
+				: {
+						title: { $regex: filter, $options: "i" },
+						location: { $regex: location, $options: "i" }
+				  }
 		)
 		.limit(limit)
 		.skip(skip)

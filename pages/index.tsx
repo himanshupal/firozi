@@ -16,13 +16,6 @@ import Modal from "components/Modal"
 
 import { AD_CORE_FIELDS_FRAGMENT } from "queries/ads"
 
-interface HomeProps {
-	ads: Array<Ad>
-	user: User
-	error: string
-	userId: string
-}
-
 const Home = (): JSX.Element => {
 	const [login, setLogin] = useState<boolean>(false)
 
@@ -30,6 +23,7 @@ const Home = (): JSX.Element => {
 	const userId = userState((state) => state.userId)
 	const setLoading = appState((state) => state.setLoading)
 	const searchTerm = filterState((state) => state.searchTerm)
+	const locationTerm = filterState((state) => state.locationTerm)
 
 	const router = useRouter()
 
@@ -39,8 +33,8 @@ const Home = (): JSX.Element => {
 	}>(
 		gql`
 			${AD_CORE_FIELDS_FRAGMENT}
-			query ads($userId: ID, $searchTerm: String) {
-				ads(filter: $searchTerm) {
+			query ads($userId: ID, $searchTerm: String, $locationTerm: String) {
+				ads(filter: $searchTerm, location: $locationTerm) {
 					...AdCoreFields
 					condition
 					workingHours
@@ -54,7 +48,13 @@ const Home = (): JSX.Element => {
 				}
 			}
 		`,
-		{ variables: { userId: userId || null, searchTerm } }
+		{
+			variables: {
+				userId: userId || null,
+				searchTerm,
+				locationTerm
+			}
+		}
 	)
 
 	useEffect(() => replaceSaved(data?.user?.saved), [data?.user])
@@ -63,9 +63,9 @@ const Home = (): JSX.Element => {
 		getAds()
 		if (loading) setLoading("Loading Ads")
 		else setLoading(false)
-	}, [searchTerm, loading])
+	}, [searchTerm, locationTerm, loading])
 
-	useEffect(() => getAds(), [])
+	useEffect(() => getAds(), [userId])
 
 	return (
 		<Fragment>

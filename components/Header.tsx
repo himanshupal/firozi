@@ -36,7 +36,10 @@ const Header = (): JSX.Element => {
 	)
 
 	const [profileIcon, setProfileIcon] = useState<string>("")
-	const [inputPlaceholder, setInputPlaceholder] = useState<string>("Search")
+	const [searchPlaceholder, setSearchPlaceholder] =
+		useState<string>("Search Ads")
+	const [locationPlaceholder, setLocationPlaceholder] =
+		useState<string>("Search Location")
 
 	const [userId, avatar, setUserId, setUserAvatar, purge] = userState(
 		(state) => [
@@ -54,14 +57,16 @@ const Header = (): JSX.Element => {
 		setSearchQuery,
 		locationQuery,
 		setLocationQuery,
-		setSearchTerm
+		setSearchTerm,
+		setLocationTerm
 	] = filterState(
 		(state) => [
 			state.search,
 			state.setSearch,
 			state.location,
 			state.setLocation,
-			state.setSearchTerm
+			state.setSearchTerm,
+			state.setLocationTerm
 		],
 		shallow
 	)
@@ -159,30 +164,37 @@ const Header = (): JSX.Element => {
 							name="search"
 							type="search"
 							value={searchQuery}
-							placeholder={inputPlaceholder}
+							placeholder={searchPlaceholder}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							onFocus={() => setInputPlaceholder("Press Enter to Search")}
-							onBlur={() => setInputPlaceholder("Search")}
+							onFocus={() => setSearchPlaceholder("Press Enter to Search")}
+							onBlur={() => setSearchPlaceholder("Search Ads")}
 							className="w-full px-2 h-8"
 						/>
 						<button type="submit" style={{ display: "none" }} />
 					</form>
 
-					<div className="hidden md:flex w-full lg:w-72 px-2 h-8 text-blood">
+					<form
+						className="hidden md:flex w-full lg:w-72 px-2 h-8 text-blood"
+						onSubmit={(e) => {
+							e.preventDefault()
+							setLocationTerm(locationQuery)
+						}}
+					>
 						<span className="bg-white w-8 h-8 flex items-center justify-center">
 							<img src="/icons/location.svg" alt="Search Icon" />
 						</span>
-						<select
+						<input
 							name="location"
-							placeholder="Location"
-							className="hidden md:block w-full lg:w-72 px-2 h-8 text-blood appearance-none"
-						>
-							<option value="priceInc">Price: Low to High</option>
-							<option value="priceDec">Price: High to Low</option>
-							<option value="postNew">Most Recent</option>
-							<option value="postOld">Oldest First</option>
-						</select>
-					</div>
+							type="search"
+							value={locationQuery}
+							placeholder={locationPlaceholder}
+							onChange={(e) => setLocationQuery(e.target.value)}
+							onFocus={() => setLocationPlaceholder("Press Enter to Search")}
+							onBlur={() => setLocationPlaceholder("Search Location")}
+							className="w-full px-2 h-8"
+						/>
+						<button type="submit" style={{ display: "none" }} />
+					</form>
 
 					<img
 						className={
