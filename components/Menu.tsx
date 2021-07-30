@@ -8,21 +8,26 @@ import "rc-slider/assets/index.css"
 
 const Menu = ({ reference }): JSX.Element => {
 	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })
-	const [inputPlaceholder, setInputPlaceholder] = useState<string>("Search")
+	const [searchPlaceholder, setSearchPlaceholder] =
+		useState<string>("Search Ads")
+	const [locationPlaceholder, setLocationPlaceholder] =
+		useState<string>("Search Location")
 
 	const [
 		searchQuery,
 		setSearchQuery,
 		locationQuery,
 		setLocationQuery,
-		setSearchTerm
+		setSearchTerm,
+		setLocationTerm
 	] = filterState(
 		(state) => [
 			state.search,
 			state.setSearch,
 			state.location,
 			state.setLocation,
-			state.setSearchTerm
+			state.setSearchTerm,
+			state.setLocationTerm
 		],
 		shallow
 	)
@@ -57,10 +62,10 @@ const Menu = ({ reference }): JSX.Element => {
 								type="search"
 								value={searchQuery}
 								className="w-full px-2 h-8"
-								placeholder={inputPlaceholder}
+								placeholder={searchPlaceholder}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								onFocus={() => setInputPlaceholder("Press Enter to Search")}
-								onBlur={() => setInputPlaceholder("Search")}
+								onFocus={() => setSearchPlaceholder("Press Enter to Search")}
+								onBlur={() => setSearchPlaceholder("Search")}
 							/>
 							<button type="submit" style={{ display: "none" }} />
 						</form>
@@ -75,9 +80,27 @@ const Menu = ({ reference }): JSX.Element => {
 					</label>
 					<div className="flex">
 						<span className="bg-white w-8 h-8 flex items-center justify-center">
-							<img src="/icons/location.svg" alt="Location Icon" />
+							<img src="/icons/location.svg" alt="Search Icon" />
 						</span>
-						<input name="location" type="search" className="w-full px-2 h-8" />
+						<form
+							className="w-full"
+							onSubmit={(e) => {
+								e.preventDefault()
+								setLocationTerm(locationQuery)
+							}}
+						>
+							<input
+								name="location"
+								type="search"
+								value={locationQuery}
+								placeholder={locationPlaceholder}
+								onChange={(e) => setLocationQuery(e.target.value)}
+								onFocus={() => setLocationPlaceholder("Press Enter to Search")}
+								onBlur={() => setLocationPlaceholder("Search Location")}
+								className="w-full px-2 h-8"
+							/>
+							<button type="submit" style={{ display: "none" }} />
+						</form>
 					</div>
 				</div>
 			</div>
