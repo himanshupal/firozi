@@ -34,17 +34,17 @@ body {
 }
 
 ::-webkit-scrollbar {
-	width: 5px;
+	width: 7.5px;
 	height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-	background: #fff;
+	background: #364ac5;
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #ccc;
-	border-radius: 2.5px;
+	background: #0f91ff;
+	// border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

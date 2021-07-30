@@ -151,7 +151,7 @@ export const categories: Array<Category> = [
 							},
 							{
 								_id: "1345",
-								name: "Netwoking Device"
+								name: "Networking Device"
 							}
 						]
 					},
@@ -259,7 +259,7 @@ export const categories: Array<Category> = [
 					},
 					{
 						_id: "196",
-						name: "Tubelight"
+						name: "Tube Light"
 					},
 					{
 						_id: "197",

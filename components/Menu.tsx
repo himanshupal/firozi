@@ -1,10 +1,56 @@
 import { Range } from "rc-slider"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 
 import shallow from "zustand/shallow"
 import filterState from "store/filter"
+import categories from "data/categories"
 
 import "rc-slider/assets/index.css"
+import { Category } from "models/Category"
+
+interface CategorySelectorProps {
+	list: Array<Category>
+	level?: number
+}
+
+const CategoryItem = ({ category, level }) => {
+	return (
+		<div
+			className="w-full h-8 text-white flex items-center"
+			style={{
+				paddingLeft: `${16 * level}px`,
+				fontSize: `${18 - level * 1.5}px`
+			}}
+		>
+			<input id={`category-${category._id}`} type="checkbox" />
+			<label
+				className="pl-1.5 whitespace-nowrap"
+				htmlFor={`category-${category._id}`}
+			>
+				{category.name}
+			</label>
+		</div>
+	)
+}
+
+const CategorySelector = ({ list, level = 0 }: CategorySelectorProps) => {
+	return (
+		<div className="flex flex-col">
+			{list.map((category, index) => (
+				<Fragment key={`category-${category._id}`}>
+					{category.hasOwnProperty("children") ? (
+						<Fragment>
+							<CategoryItem category={category} level={level} />
+							<CategorySelector list={category.children} level={level + 1} />
+						</Fragment>
+					) : (
+						<CategoryItem category={category} level={level} />
+					)}
+				</Fragment>
+			))}
+		</div>
+	)
+}
 
 const Menu = ({ reference }): JSX.Element => {
 	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })
@@ -34,7 +80,7 @@ const Menu = ({ reference }): JSX.Element => {
 
 	return (
 		<div
-			className="h-content flex flex-col overflow-auto bg-blood absolute top-header z-10 min-w-full md:min-w-max md:w-1/4"
+			className="h-content flex flex-col overflow-auto bg-blood absolute top-header z-10 md:min-w-max sm:w-1/2 md:w-1/4"
 			ref={reference}
 		>
 			<div className="border-t-2 md:py-4 block md:hidden">
@@ -71,6 +117,7 @@ const Menu = ({ reference }): JSX.Element => {
 						</form>
 					</div>
 				</div>
+
 				<div className="pb-3 px-8">
 					<label
 						htmlFor="location"
@@ -120,6 +167,7 @@ const Menu = ({ reference }): JSX.Element => {
 						<option value="postOld">Oldest First</option>
 					</select>
 				</div>
+
 				<div className="pb-6 px-10">
 					<label
 						htmlFor="price"
@@ -144,50 +192,16 @@ const Menu = ({ reference }): JSX.Element => {
 						}}
 					/>
 				</div>
+
 				<div className="pb-3 px-8">
 					<label
-						htmlFor="filter"
+						htmlFor="Categories"
 						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
 					>
-						Filter
+						Categories
 					</label>
-					<input name="filter" className="w-full px-2 h-8" />
-				</div>
-				<div className="pb-3 px-8">
-					<label
-						htmlFor="filter"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
-					>
-						Filter
-					</label>
-					<input name="filter" className="w-full px-2 h-8" />
-				</div>
-				<div className="pb-3 px-8">
-					<label
-						htmlFor="filter"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
-					>
-						Filter
-					</label>
-					<input name="filter" className="w-full px-2 h-8" />
-				</div>
-				<div className="pb-3 px-8">
-					<label
-						htmlFor="filter"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
-					>
-						Filter
-					</label>
-					<input name="filter" className="w-full px-2 h-8" />
-				</div>
-				<div className="pb-3 px-8">
-					<label
-						htmlFor="filter"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
-					>
-						Filter
-					</label>
-					<input name="filter" className="w-full px-2 h-8" />
+
+					<CategorySelector list={categories} />
 				</div>
 			</div>
 
