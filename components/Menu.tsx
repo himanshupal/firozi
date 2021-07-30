@@ -22,7 +22,25 @@ const CategoryItem = ({ category, level }) => {
 				fontSize: `${18 - level * 1.5}px`
 			}}
 		>
-			<input id={`category-${category._id}`} type="checkbox" />
+			<span className="checkbox__input">
+				<input id={`category-${category._id}`} type="checkbox" />
+				<span className="checkbox__control">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<path
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="3"
+							d="M1.73 12.91l6.37 6.37L22.79 4.59"
+						/>
+					</svg>
+				</span>
+			</span>
+
 			<label
 				className="pl-1.5 whitespace-nowrap"
 				htmlFor={`category-${category._id}`}
@@ -87,7 +105,7 @@ const Menu = ({ reference }): JSX.Element => {
 				<div className="pb-3 px-8">
 					<label
 						htmlFor="search"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
+						className="block pl-2 text-white font-cursive text-2xl md:pb-2 md:text-3xl md:text-center"
 					>
 						Search
 					</label>
@@ -121,7 +139,7 @@ const Menu = ({ reference }): JSX.Element => {
 				<div className="pb-3 px-8">
 					<label
 						htmlFor="location"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
+						className="block pl-2 text-white font-cursive text-2xl md:pb-2 md:text-3xl md:text-center"
 					>
 						Location
 					</label>
@@ -156,7 +174,7 @@ const Menu = ({ reference }): JSX.Element => {
 				<div className="pb-3 px-8">
 					<label
 						htmlFor="sort"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
+						className="block pl-2 text-white font-cursive text-2xl md:pb-2 md:text-3xl md:text-center"
 					>
 						Sort by
 					</label>
@@ -171,7 +189,7 @@ const Menu = ({ reference }): JSX.Element => {
 				<div className="pb-6 px-10">
 					<label
 						htmlFor="price"
-						className="block text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
+						className="block text-white font-cursive text-2xl md:pb-2 md:text-3xl md:text-center"
 					>
 						Price
 					</label>
@@ -196,13 +214,19 @@ const Menu = ({ reference }): JSX.Element => {
 				<div className="pb-3 px-8">
 					<label
 						htmlFor="Categories"
-						className="block pl-2 text-white text-lg font-cursive sm:text-xl md:pb-2 md:text-2xl md:text-center"
+						className="block pl-2 text-white font-cursive text-2xl md:pb-2 md:text-3xl md:text-center pb-2"
 					>
 						Categories
 					</label>
 
 					<CategorySelector list={categories} />
 				</div>
+			</div>
+
+			<div className="py-2 text-white text-center">
+				<button className="border-2 px-10 py-1 rounded shadow-md hover:bg-gray-200 hover:text-blood hover:border-blue-500 transition">
+					Apply Filters
+				</button>
 			</div>
 
 			<div className="border-t-2 p-1 text-white text-center text-xs font-thin block md:hidden">

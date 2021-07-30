@@ -1,5 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Playball&family=Sen:wght@400;700;800&display=swap");
 
+$color-primary: #364ac5;
+$color-light-gray: #ccc;
+
 body {
 	margin: unset;
 
@@ -39,7 +42,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-	background: #364ac5;
+	background: $color-primary;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -48,7 +51,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: #ccc;
+	background: $color-light-gray;
 }
 
 .bricks {
@@ -75,9 +78,53 @@ body {
 
 .swiper-button-prev,
 .swiper-button-next {
-	color: #2563eb !important;
+	color: $color-primary !important;
 }
 
 .slide__width-auto {
 	width: auto !important;
+}
+
+.checkbox {
+	&__input {
+		display: grid;
+		grid-template-areas: "checkbox";
+
+		> * {
+			grid-area: checkbox;
+		}
+
+		input {
+			opacity: 0;
+			width: 1em;
+			height: 1em;
+
+			&:focus + .checkbox__control {
+				box-shadow: 0 0 0 0.025em $color-light-gray,
+					0 0 0.15em 0.05em currentColor;
+			}
+
+			&:checked + .checkbox__control svg {
+				transform: scale(1);
+			}
+
+			&:disabled + .checkbox__control {
+				color: $color-light-gray;
+			}
+		}
+	}
+
+	&__control {
+		display: inline-grid;
+		width: 1em;
+		height: 1em;
+		// border-radius: 0.25em;
+		border: 0.1rem solid currentColor;
+
+		svg {
+			transition: transform 0.1s ease-in 25ms;
+			transform: scale(0);
+			transform-origin: bottom left;
+		}
+	}
 }
