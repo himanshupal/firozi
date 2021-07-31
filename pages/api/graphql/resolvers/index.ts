@@ -1,4 +1,5 @@
 import { IResolvers } from "apollo-server-micro"
+import { PubSub } from "graphql-subscriptions"
 
 import maxPrice from "./maxPrice"
 import user from "./user"
@@ -9,6 +10,8 @@ import updateUser from "./updateUser"
 import createAd from "./createAd"
 import unsaveAd from "./unsaveAd"
 import saveAd from "./saveAd"
+
+export const pubsub = new PubSub()
 
 const resolution: IResolvers = {
 	Query: {
@@ -25,6 +28,11 @@ const resolution: IResolvers = {
 		createAd,
 		unsaveAd,
 		saveAd
+	},
+	Subscription: {
+		subTest: {
+			subscribe: (_, args) => pubsub.asyncIterator("maxPrice")
+		}
 	}
 }
 

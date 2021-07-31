@@ -286,13 +286,14 @@ const Menu = ({ reference }): JSX.Element => {
 					</label>
 					<select
 						name="sort"
+						value={sort}
 						className="w-full px-2 h-8 appearance-none"
 						onChange={(e) => setSort(e.target.value)}
 					>
-						<option value="priceInc">Price: Low to High</option>
-						<option value="priceDec">Price: High to Low</option>
-						<option value="postNew">Most Recent</option>
-						<option value="postOld">Oldest First</option>
+						<option value="price_Inc">Price: Low to High</option>
+						<option value="price_Dec">Price: High to Low</option>
+						<option value="published_Inc">Most Recent</option>
+						<option value="published_Dec">Oldest First</option>
 					</select>
 				</div>
 

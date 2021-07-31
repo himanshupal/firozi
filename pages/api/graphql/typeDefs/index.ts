@@ -7,7 +7,16 @@ import { Ad } from "./ad"
 const Query: DocumentNode = gql`
 	type Query {
 		user(_id: ID, email: String): User
-		ads(skip: Int, limit: Int, filter: String, location: String): [Ad]
+		ads(
+			skip: Int
+			limit: Int
+			filter: String
+			location: String
+			exclude: [String]
+			priceMin: Float
+			priceMax: Float
+			sortBy: String
+		): [Ad]
 		ad(slug: String): Ad
 		maxPrice: Float
 	}
@@ -43,6 +52,9 @@ const Query: DocumentNode = gql`
 
 		saveAd(ad: ID!, user: ID!): Boolean
 		unsaveAd(ad: ID!, user: ID!): Boolean
+	}
+	type Subscription {
+		subTest: Int
 	}
 `
 

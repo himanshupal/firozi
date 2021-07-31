@@ -1,9 +1,27 @@
+import { gql, useLazyQuery, useSubscription } from "@apollo/client"
 import ClientOnly from "components/clientOnly"
+import { useEffect } from "react"
 import computed from "store/computed"
 
 const List = () => {
 	const categories = computed((state) => state.categories)
 	const setCategoryList = computed((state) => state.setCategories)
+
+	const { data, error } = useSubscription(gql`
+		subscription {
+			subTest
+		}
+	`)
+
+	const [fetch, { data: maxPrice }] = useLazyQuery(
+		gql`
+			{
+				maxPrice
+			}
+		`
+	)
+
+	useEffect(() => console.log({ data, maxPrice, error }))
 
 	return (
 		<ClientOnly>
@@ -12,7 +30,6 @@ const List = () => {
 					<option>Job</option>
 					<option>Product</option>
 				</select>
-
 				<select name="list" className="w-full px-2 h-8 appearance-none">
 					{categories.map((item) => (
 						<option key={item._id} value={item._id}>
@@ -21,6 +38,8 @@ const List = () => {
 					))}
 				</select>
 			</div>
+
+			<button onClick={() => fetch()}>Fetch</button>
 		</ClientOnly>
 	)
 }
