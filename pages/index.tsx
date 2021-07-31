@@ -24,12 +24,14 @@ const Home = (): JSX.Element => {
 	const setLoading = appState((state) => state.setLoading)
 	const searchTerm = filterState((state) => state.searchTerm)
 	const locationTerm = filterState((state) => state.locationTerm)
+	const setMaxPrice = filterState((state) => state.setMaxPrice)
 
 	const router = useRouter()
 
 	const [getAds, { data, loading, error }] = useLazyQuery<{
 		user: User
 		ads: Array<Ad>
+		maxPrice: number
 	}>(
 		gql`
 			${AD_CORE_FIELDS_FRAGMENT}
@@ -46,6 +48,7 @@ const Home = (): JSX.Element => {
 					_id
 					saved
 				}
+				maxPrice
 			}
 		`,
 		{
@@ -57,6 +60,7 @@ const Home = (): JSX.Element => {
 		}
 	)
 
+	useEffect(() => setMaxPrice(data?.maxPrice || 10_000), [data])
 	useEffect(() => replaceSaved(data?.user?.saved), [data?.user])
 
 	useEffect(() => {

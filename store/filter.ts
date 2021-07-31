@@ -4,15 +4,21 @@ import create from "zustand"
 import { persist } from "zustand/middleware"
 
 interface FilterState {
+	sort: string
 	search: string
 	searchTerm: string
 	location: string
+	maxPrice: number
 	locationTerm: string
+	price: Record<string, number>
 	categoryFilters: Array<string>
 
+	setSort: (method: string) => void
 	setSearch: (query: string) => void
 	setLocation: (query: string) => void
+	setMaxPrice: (price: number) => void
 	setLocationTerm: (term: string) => void
+	setPrice: (min: number, max: number) => void
 	updateCategoryFilters: (categoryId: string) => void
 	setSearchTerm: (term: string) => void
 }
@@ -20,54 +26,41 @@ interface FilterState {
 export default create<FilterState>(
 	persist(
 		(set) => ({
+			sort: "",
 			search: "",
 			searchTerm: "",
 			location: "",
+			maxPrice: 10_000,
 			locationTerm: "",
+			price: { min: 100, max: 10_000 },
 			categoryFilters: flatList(categories).map((x) => x._id),
 
+			setSort: (method: string) => set((state) => ({ ...state, sort: method })),
 			setSearch: (search: string) => set((state) => ({ ...state, search })),
 			setSearchTerm: (searchTerm: string) =>
 				set((state) => ({ ...state, searchTerm })),
 			setLocation: (location: string) =>
 				set((state) => ({ ...state, location })),
+			setMaxPrice: (price: number) =>
+				set((state) => ({ ...state, maxPrice: price })),
 			setLocationTerm: (locationTerm: string) =>
 				set((state) => ({ ...state, locationTerm })),
+			setPrice: (min, max) =>
+				set((state) => ({ ...state, price: { min, max } })),
 			updateCategoryFilters: (categoryId: string) =>
-				set((state) => {
-					console.table([
-						...(state.categoryFilters.filter((x) =>
-							new RegExp(`^${categoryId.slice(0, -1)}\\d{1}`).test(x)
-						).length === 0
-							? state.categoryFilters.filter(
-									(x) => !new RegExp(`^${categoryId.slice(0, -1)}\\d`).test(x)
-							  )
-							: state.categoryFilters.filter(
-									(x) => !new RegExp(`^${categoryId}`).test(x)
-							  ))
-					])
-
-					return {
-						...state,
-						categoryFilters: state.categoryFilters.includes(categoryId)
-							? state.categoryFilters.filter(
-									(x) => !new RegExp(`^${categoryId}`).test(x)
-							  )
-							: [
-									...state.categoryFilters,
-									...(state.categoryFilters.includes(categoryId.slice(0, -1))
-										? flatList(categories)
-												.map((x) => x._id)
-												.filter((x) => new RegExp(`^${categoryId}`).test(x))
-										: [
-												categoryId.slice(0, -1),
-												...flatList(categories)
-													.map((x) => x._id)
-													.filter((x) => new RegExp(`^${categoryId}`).test(x))
-										  ])
-							  ]
-					}
-				})
+				set((state) => ({
+					...state,
+					categoryFilters: state.categoryFilters.includes(categoryId)
+						? state.categoryFilters.filter(
+								(x) => !new RegExp(`^${categoryId}`).test(x)
+						  )
+						: [
+								...state.categoryFilters,
+								...flatList(categories)
+									.map((x) => x._id)
+									.filter((x) => new RegExp(`^${categoryId}`).test(x))
+						  ]
+				}))
 		}),
 		{ name: "filter", getStorage: () => sessionStorage }
 	)

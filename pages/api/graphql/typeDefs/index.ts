@@ -9,6 +9,7 @@ const Query: DocumentNode = gql`
 		user(_id: ID, email: String): User
 		ads(skip: Int, limit: Int, filter: String, location: String): [Ad]
 		ad(slug: String): Ad
+		maxPrice: Float
 	}
 	type Mutation {
 		updateUser(

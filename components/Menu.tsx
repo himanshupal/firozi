@@ -2,11 +2,17 @@ import { Range } from "rc-slider"
 import { Fragment, useState } from "react"
 
 import shallow from "zustand/shallow"
+import userState from "store/user"
 import filterState from "store/filter"
 import categories from "data/categories"
 
 import "rc-slider/assets/index.css"
 import { Category } from "models/Category"
+import { gql, useLazyQuery } from "@apollo/client"
+import { User } from "models/User"
+import { Ad } from "models/Ad"
+import { AD_CORE_FIELDS_FRAGMENT } from "queries/ads"
+import flatList from "helpers/flatList"
 
 interface CategorySelectorProps {
 	list: Array<Category>
@@ -99,16 +105,24 @@ const CategorySelector = ({
 }
 
 const Menu = ({ reference }): JSX.Element => {
-	const [{ min, max }, setRange] = useState({ min: 0, max: 1500 })
 	const [searchPlaceholder, setSearchPlaceholder] =
 		useState<string>("Search Ads")
 	const [locationPlaceholder, setLocationPlaceholder] =
 		useState<string>("Search Location")
 
+	const userId = userState((state) => state.userId)
+
 	const [
+		sort,
+		setSort,
+		price,
+		setPrice,
 		searchQuery,
 		setSearchQuery,
 		locationQuery,
+		maxPrice,
+		searchTerm,
+		locationTerm,
 		categoryFilters,
 		setLocationQuery,
 		setSearchTerm,
@@ -116,9 +130,16 @@ const Menu = ({ reference }): JSX.Element => {
 		updateCategoryFilters
 	] = filterState(
 		(state) => [
+			state.sort,
+			state.setSort,
+			state.price,
+			state.setPrice,
 			state.search,
 			state.setSearch,
 			state.location,
+			state.maxPrice,
+			state.searchTerm,
+			state.locationTerm,
 			state.categoryFilters,
 			state.setLocation,
 			state.setSearchTerm,
@@ -126,6 +147,59 @@ const Menu = ({ reference }): JSX.Element => {
 			state.updateCategoryFilters
 		],
 		shallow
+	)
+
+	const [getAds] = useLazyQuery<{
+		user: User
+		ads: Array<Ad>
+		maxPrice: number
+	}>(
+		gql`
+			${AD_CORE_FIELDS_FRAGMENT}
+			query ads(
+				$userId: ID
+				$searchTerm: String
+				$locationTerm: String
+				$categories: [String]
+				$priceMin: Float
+				$priceMax: Float
+				$sort: String
+			) {
+				ads(
+					filter: $searchTerm
+					location: $locationTerm
+					exclude: $categories
+					priceMin: $priceMin
+					priceMax: $priceMax
+					sortBy: $sort
+				) {
+					...AdCoreFields
+					condition
+					workingHours
+					offlineOnly
+					workingPeriod
+					salaryPeriod
+				}
+				user(_id: $userId) {
+					_id
+					saved
+				}
+				maxPrice
+			}
+		`,
+		{
+			variables: {
+				userId: userId || null,
+				searchTerm,
+				locationTerm,
+				categories: flatList(categories)
+					.map((x) => x._id)
+					.filter((x) => !categoryFilters.includes(x)),
+				priceMin: price.min,
+				priceMax: price.max,
+				sort
+			}
+		}
 	)
 
 	return (
@@ -210,7 +284,11 @@ const Menu = ({ reference }): JSX.Element => {
 					>
 						Sort by
 					</label>
-					<select name="sort" className="w-full px-2 h-8 appearance-none">
+					<select
+						name="sort"
+						className="w-full px-2 h-8 appearance-none"
+						onChange={(e) => setSort(e.target.value)}
+					>
 						<option value="priceInc">Price: Low to High</option>
 						<option value="priceDec">Price: High to Low</option>
 						<option value="postNew">Most Recent</option>
@@ -226,18 +304,19 @@ const Menu = ({ reference }): JSX.Element => {
 						Price
 					</label>
 					<Range
-						max={1500}
+						max={maxPrice}
 						step={50}
-						defaultValue={[min, max]}
-						onChange={([min, max]) => setRange({ min, max })}
+						value={[price.min, price.max]}
+						onChange={([min, max]) => setPrice(min, max)}
 						marks={{
-							[min]: {
+							[price.min]: {
 								style: { color: "white" },
-								label: min === 0 ? "MIN" : `₹${min}`
+								label: `₹${price.min.toString()}`
 							},
-							[max]: {
+							[price.max]: {
 								style: { color: "white" },
-								label: max === 1500 ? "MAX" : `₹${max}`
+								label:
+									price.max === maxPrice ? "MAX" : `₹${price.max.toString()}`
 							}
 						}}
 					/>
@@ -260,7 +339,10 @@ const Menu = ({ reference }): JSX.Element => {
 			</div>
 
 			<div className="py-2 text-white text-center">
-				<button className="border-2 px-10 py-1 rounded shadow-md hover:bg-gray-200 hover:text-blood hover:border-blue-500 transition">
+				<button
+					className="border-2 px-10 py-1 rounded shadow-md hover:bg-gray-200 hover:text-blood hover:border-blue-500 transition"
+					// onClick={() => getAds()}
+				>
 					Apply Filters
 				</button>
 			</div>
