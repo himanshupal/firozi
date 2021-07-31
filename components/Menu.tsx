@@ -11,9 +11,11 @@ import { Category } from "models/Category"
 interface CategorySelectorProps {
 	list: Array<Category>
 	level?: number
+	checked?: Array<string>
+	updateChecked?: (string) => void
 }
 
-const CategoryItem = ({ category, level }) => {
+const CategoryItem = ({ category, level, checked, updateChecked }) => {
 	return (
 		<div
 			className="w-full h-8 text-white flex items-center"
@@ -23,7 +25,13 @@ const CategoryItem = ({ category, level }) => {
 			}}
 		>
 			<span className="checkbox__input">
-				<input id={`category-${category._id}`} type="checkbox" />
+				<input
+					id={`category-${category._id}`}
+					type="checkbox"
+					checked={checked.includes(category._id)}
+					onChange={() => updateChecked(category._id)}
+				/>
+
 				<span className="checkbox__control">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -42,7 +50,7 @@ const CategoryItem = ({ category, level }) => {
 			</span>
 
 			<label
-				className="pl-1.5 whitespace-nowrap"
+				className="pl-1.5 whitespace-nowrap flex-grow"
 				htmlFor={`category-${category._id}`}
 			>
 				{category.name}
@@ -51,18 +59,38 @@ const CategoryItem = ({ category, level }) => {
 	)
 }
 
-const CategorySelector = ({ list, level = 0 }: CategorySelectorProps) => {
+const CategorySelector = ({
+	list,
+	level = 0,
+	checked,
+	updateChecked
+}: CategorySelectorProps) => {
 	return (
 		<div className="flex flex-col">
-			{list.map((category, index) => (
+			{list.map((category) => (
 				<Fragment key={`category-${category._id}`}>
 					{category.hasOwnProperty("children") ? (
 						<Fragment>
-							<CategoryItem category={category} level={level} />
-							<CategorySelector list={category.children} level={level + 1} />
+							<CategoryItem
+								category={category}
+								level={level}
+								checked={checked}
+								updateChecked={updateChecked}
+							/>
+							<CategorySelector
+								list={category.children}
+								level={level + 1}
+								checked={checked}
+								updateChecked={updateChecked}
+							/>
 						</Fragment>
 					) : (
-						<CategoryItem category={category} level={level} />
+						<CategoryItem
+							category={category}
+							level={level}
+							checked={checked}
+							updateChecked={updateChecked}
+						/>
 					)}
 				</Fragment>
 			))}
@@ -81,17 +109,21 @@ const Menu = ({ reference }): JSX.Element => {
 		searchQuery,
 		setSearchQuery,
 		locationQuery,
+		categoryFilters,
 		setLocationQuery,
 		setSearchTerm,
-		setLocationTerm
+		setLocationTerm,
+		updateCategoryFilters
 	] = filterState(
 		(state) => [
 			state.search,
 			state.setSearch,
 			state.location,
+			state.categoryFilters,
 			state.setLocation,
 			state.setSearchTerm,
-			state.setLocationTerm
+			state.setLocationTerm,
+			state.updateCategoryFilters
 		],
 		shallow
 	)
@@ -219,7 +251,11 @@ const Menu = ({ reference }): JSX.Element => {
 						Categories
 					</label>
 
-					<CategorySelector list={categories} />
+					<CategorySelector
+						list={categories}
+						checked={categoryFilters}
+						updateChecked={updateCategoryFilters}
+					/>
 				</div>
 			</div>
 
@@ -229,7 +265,7 @@ const Menu = ({ reference }): JSX.Element => {
 				</button>
 			</div>
 
-			<div className="border-t-2 p-1 text-white text-center text-xs font-thin block md:hidden">
+			<div className="border-t-2 p-1 pl-2 text-white text-xs font-thin block">
 				&copy; {new Date().getFullYear()} Firozi Inc.
 			</div>
 		</div>

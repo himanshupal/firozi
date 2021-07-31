@@ -98,6 +98,7 @@ body {
 			opacity: 0;
 			width: 1em;
 			height: 1em;
+			z-index: 1;
 
 			&:focus + .checkbox__control {
 				box-shadow: 0 0 0 0.025em $color-light-gray,
