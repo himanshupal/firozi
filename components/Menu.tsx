@@ -127,7 +127,8 @@ const Menu = ({ reference }): JSX.Element => {
 		setLocationQuery,
 		setSearchTerm,
 		setLocationTerm,
-		updateCategoryFilters
+		updateCategoryFilters,
+		clearFilters
 	] = filterState(
 		(state) => [
 			state.sort,
@@ -144,7 +145,8 @@ const Menu = ({ reference }): JSX.Element => {
 			state.setLocation,
 			state.setSearchTerm,
 			state.setLocationTerm,
-			state.updateCategoryFilters
+			state.updateCategoryFilters,
+			state.clearFilters
 		],
 		shallow
 	)
@@ -339,13 +341,19 @@ const Menu = ({ reference }): JSX.Element => {
 				</div>
 			</div>
 
-			<div className="py-2 text-white text-center">
+			<div className="pt-2 text-white text-center">
 				<button
 					className="border-2 px-10 py-1 rounded shadow-md hover:bg-gray-200 hover:text-blood hover:border-blue-500 transition"
-					// onClick={() => getAds()}
+					onClick={() => getAds()}
 				>
 					Apply Filters
 				</button>
+				<div
+					className="text-xs py-1 cursor-pointer mx-auto"
+					onClick={clearFilters}
+				>
+					Reset
+				</div>
 			</div>
 
 			<div className="border-t-2 p-1 pl-2 text-white text-xs font-thin block">

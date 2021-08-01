@@ -255,7 +255,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 			{modal && <Modal title={message} toggle={setModal} fixed />}
 
-			<div className="flex justify-around">
+			<div className="flex justify-around lg:px-12">
 				<form
 					className="flex flex-col sm:w-2/3 p-3"
 					onSubmit={(e) => {
@@ -355,7 +355,8 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="Provide a detailed description"
 						required
-						className="border-blood border-2 mb-3 w-full px-2 h-20 focus-visible:outline-none text-gray-600"
+						rows={5}
+						className="border-blood border-2 mb-3 w-full px-2 focus-visible:outline-none text-gray-600"
 					/>
 
 					<label
@@ -370,7 +371,10 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							type="search"
 							name="category"
 							autoComplete="off"
-							value={category}
+							value={
+								flatList(categories).filter((x) => x._id === category)[0]
+									?.name || ""
+							}
 							id="categoryInput"
 							onFocus={() => setCategoryListActive(true)}
 							onChange={(e) => {
@@ -401,7 +405,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 								<li
 									key={item._id}
 									onClick={() => {
-										setCategory(item.name)
+										setCategory(item._id)
 										setCategoryListActive(false)
 									}}
 									className="px-2 border-b border-gray-100 text-sm md:text-base"

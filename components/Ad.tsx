@@ -5,6 +5,7 @@ import { durationShort } from "helpers/duration"
 
 import store from "store"
 import shallow from "zustand/shallow"
+import { districts } from "data/districts"
 
 type AdProps = {
 	userId: string
@@ -46,7 +47,7 @@ const AdCard = ({ userId, ad }: AdProps) => {
 
 	return (
 		<div
-			className={`rounded-xl text-blood w-72 shadow-lg my-3 mx-3 text-left hover:shadow-xl transition-all relative ${
+			className={`rounded-xl text-blood w-72 shadow my-3 mx-3 text-left hover:shadow-lg transition-all relative ${
 				router.pathname !== "/" ? `flex flex-col flex-shrink-0` : `inline-block`
 			}`}
 		>
@@ -78,7 +79,11 @@ const AdCard = ({ userId, ad }: AdProps) => {
 				(image, index) =>
 					index === 0 && (
 						<img
-							className="w-full object-cover rounded-t-xl"
+							className={
+								router.pathname !== "/"
+									? `w-full object-cover rounded-t-xl max-h-48`
+									: `w-full object-cover rounded-t-xl`
+							}
 							src={image}
 							alt={`${ad.slug}-image`}
 							key={`ad-${index + 1}`}
@@ -116,7 +121,16 @@ const AdCard = ({ userId, ad }: AdProps) => {
 			</div>
 			<div className="border-t-2 flex items-center justify-between py-1 px-3 text-sm">
 				<div className="overflow-ellipsis overflow-x-hidden whitespace-nowrap flex-grow">
-					{ad.location}
+					{
+						districts
+							.map(
+								(x) =>
+									x.districts.filter((x) =>
+										new RegExp(`^.*${x}.*$`, "i").test(ad.location)
+									)[0]
+							)
+							.filter((x) => x)[0]
+					}
 				</div>
 				{ad.published && (
 					<div className="whitespace-nowrap pl-2">{ad.published}</div>

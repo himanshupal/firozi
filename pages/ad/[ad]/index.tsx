@@ -3,19 +3,19 @@ import { gql } from "@apollo/client"
 import client from "helpers/apolloclient"
 import { Ad as AdModel } from "models/Ad"
 import { GetServerSideProps } from "next"
-import { getSession } from "next-auth/client"
 import { Fragment, useEffect, useState } from "react"
 import SwiperCore, { Mousewheel, Navigation, Pagination } from "swiper/core"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { durationShort } from "helpers/duration"
+import userState from "store/user"
 import Modal from "components/Modal"
 import Login from "components/Login"
 
-import "swiper/swiper.min.css"
-import "swiper/components/navigation/navigation.min.css"
-import "swiper/components/pagination/pagination.min.css"
 import AdCard from "components/Ad"
 import { toast } from "react-toastify"
+import flatList from "helpers/flatList"
+import categories from "data/categories"
+import { image } from "helpers/getImage"
 
 SwiperCore.use([Pagination, Navigation, Mousewheel])
 
@@ -25,9 +25,11 @@ interface AdProps {
 	userId: string
 }
 
-const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
+const Ad = ({ ad, error }: AdProps): JSX.Element => {
 	const [avatar, setAvatar] = useState<string>()
 	const [login, setLogin] = useState<boolean>(false)
+
+	const userId = userState((state) => state.userId)
 
 	useEffect(() => {
 		const getHash = async () => {
@@ -83,14 +85,14 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 					</Swiper>
 
 					<div className="my-4 md:mr-12 px-6 md:px-12 py-1 bg-blue-600 text-white text-sm font-thin overflow-x-auto md:rounded-r-full whitespace-nowrap">
-						{ad.category}
+						{flatList(categories).filter((x) => x._id === ad.category)[0].name}
 					</div>
 
 					<div className="px-6 md:px-12 pb-3">
 						<div className="text-5xl md:text-7xl text-green-800 font-extrabold relative">
 							{ad.title}
 							<img
-								className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-0"
+								className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-0 cursor-pointer"
 								onClick={shareAd}
 								src="/icons/share.svg"
 								alt="Share Icon"
@@ -156,16 +158,13 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 				</div>
 
 				{!!userId ? (
-					<div className="flex flex-col w-full md:w-1/3 px-6 items-center text-center pb-6">
+					<div className="flex flex-col flex-grow py-6 items-center text-center">
 						<div className="text-2xl py-3 font-extralight">Ad posted by</div>
 						{ad.createdBy ? (
 							<>
 								<img
 									src={
-										ad.createdBy?.avatar?.replace(
-											/upload/,
-											"upload/c_limit,h_220,q_75,w_220"
-										) ||
+										image(ad.createdBy?.avatar) ||
 										`https://gravatar.com/avatar/${avatar}?s=220&d=robohash`
 									}
 									alt="User Avatar"
@@ -217,7 +216,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 						)}
 					</div>
 				) : (
-					<div className="text-lg lg:text-2xl font-bold text-center py-2 px-6 md:1/3">
+					<div className="text-lg lg:text-2xl font-bold text-center py-6">
 						You need to{" "}
 						<span
 							className="border-b cursor-pointer"
@@ -232,7 +231,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 			</div>
 
 			<div className="flex flex-col">
-				<div className="px-6 py-3 md:px-12 text-3xl">
+				<div className="px-6 py-3 md:px-12 text-3xl font-semibold border-b">
 					More Ads by {(userId && ad.createdBy?.name) ?? "User"}
 				</div>
 				<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
@@ -252,7 +251,7 @@ const Ad = ({ ad, error, userId }: AdProps): JSX.Element => {
 					</Swiper>
 				</div>
 
-				<div className="px-6 py-3 md:px-12 text-3xl">
+				<div className="px-6 py-3 md:px-12 text-3xl font-semibold border-b">
 					Latest ads from this category
 				</div>
 				<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
@@ -284,11 +283,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 	req,
 	params: { ad: slug }
 }) => {
-	const session = await getSession({ req })
-
-	// @ts-ignore
-	const userId = session?.user?.sub || null
-
 	const {
 		data: { ad },
 		error
@@ -332,7 +326,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
 	return {
 		props: {
-			userId,
 			ad: { ...ad, slug },
 			error: error?.message || null
 		}

@@ -19,10 +19,10 @@ body {
 		list-style: none;
 	}
 
-	*::selection {
-		color: white;
-		background-color: #67000c;
-	}
+	// *::selection {
+	// 	color: white;
+	// 	background-color: #67000c;
+	// }
 
 	// Hiding arrows from number text-field
 	input::-webkit-outer-spin-button,

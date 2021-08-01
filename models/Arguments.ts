@@ -3,4 +3,9 @@ export interface Arguments {
 	limit?: number
 	filter?: string
 	location?: string
+
+	exclude: Array<string>
+	priceMin: number
+	priceMax: number
+	sortBy: string
 }

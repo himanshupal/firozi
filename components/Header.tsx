@@ -207,13 +207,13 @@ const Header = (): JSX.Element => {
 						id="subMenuToggle"
 						src={profileIcon || `/icons/${session ? "profile" : "key"}.svg`}
 						onClick={() =>
-							session ? setSubMenu(!subMenu) : setLogin((login) => !login)
+							userId ? setSubMenu(!subMenu) : setLogin((login) => !login)
 						}
 					/>
 				</div>
 			</header>
 
-			{subMenu && session && (
+			{subMenu && userId && (
 				<div
 					className="bg-blood rounded-lg text-lg text-white text-center font-cursive absolute right-0 py-2 m-2 z-10"
 					ref={subMenuRef}

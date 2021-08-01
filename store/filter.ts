@@ -21,6 +21,7 @@ interface FilterState {
 	setPrice: (min: number, max: number) => void
 	updateCategoryFilters: (categoryId: string) => void
 	setSearchTerm: (term: string) => void
+	clearFilters: () => void
 }
 
 export default create<FilterState>(
@@ -60,7 +61,18 @@ export default create<FilterState>(
 									.map((x) => x._id)
 									.filter((x) => new RegExp(`^${categoryId}`).test(x))
 						  ]
-				}))
+				})),
+			clearFilters: () =>
+				set({
+					sort: "",
+					search: "",
+					searchTerm: "",
+					location: "",
+					maxPrice: 10_000,
+					locationTerm: "",
+					price: { min: 100, max: 10_000 },
+					categoryFilters: flatList(categories).map((x) => x._id)
+				})
 		}),
 		{ name: "filter", getStorage: () => sessionStorage }
 	)
