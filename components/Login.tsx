@@ -15,20 +15,6 @@ const Login = ({ toggle }: LoginProps): JSX.Element => {
 			<div className="flex gap-2 justify-around">
 				<img
 					tabIndex={0}
-					alt="Instagram Logo"
-					className="cursor-pointer"
-					src="/icons/instagram.svg"
-					onClick={() => signIn("instagram")}
-				/>
-				<img
-					tabIndex={0}
-					alt="Facebook Logo"
-					className="cursor-pointer"
-					src="/icons/facebook.svg"
-					onClick={() => signIn("facebook")}
-				/>
-				<img
-					tabIndex={0}
 					alt="Google Logo"
 					className="cursor-pointer"
 					src="/icons/google.svg"
