@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client"
+import { useLazyQuery, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { useSession } from "next-auth/client"
 import Head from "next/head"
@@ -6,7 +6,7 @@ import { Fragment, useState, useRef, useEffect, useMemo } from "react"
 
 import Modal from "components/Modal"
 import { toast } from "react-toastify"
-import { GetStaticPaths, GetStaticProps, NextPageContext } from "next"
+import { NextPageContext } from "next"
 import { useRouter } from "next/router"
 import AdCard from "components/Ad"
 import { getWindowSize } from "helpers/getWindowSize"
@@ -15,101 +15,14 @@ import categories from "data/categories"
 import { Category } from "models/Category"
 import { districts } from "data/districts"
 import { District } from "models/District"
-import { Ad as AdModel } from "models/Ad"
+
+import { CREATE_AD, USER_ADS } from "queries/ads"
 
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
 type Handler = "Buyer" | "Seller"
 
-const AD_DETAILS = gql`
-	query ad($slug: String) {
-		ad(slug: $slug) {
-			description
-			category
-			images
-			price
-			adtype
-			location
-			salaryPeriod
-			workingPeriod
-			offlineOnly
-			offlineOnly
-			workingHours
-			workingPeriod
-			negotiable
-			usedFor
-			condition
-			shippingBy
-			title
-			_id
-		}
-	}
-`
-
-const USERS_ADS = gql`
-	query getUserAds($id: String) {
-		user(_id: $id) {
-			_id
-			ads {
-				title
-				slug
-				description
-				category
-				images
-				price
-				adtype
-				createdAt
-				negotiable
-				workingHours
-				offlineOnly
-				workingPeriod
-				salaryPeriod
-			}
-		}
-	}
-`
-
-const CREATE_AD = gql`
-	mutation createAd(
-		$title: String
-		$description: String
-		$category: String
-		$images: [String]
-		$price: Float
-		$adtype: String
-		$usedFor: String
-		$condition: String
-		$shippingBy: String
-		$negotiable: Boolean
-		$workingHours: String
-		$workingPeriod: String
-		$salaryPeriod: String
-		$offlineOnly: Boolean
-		$location: String
-		$createdBy: String
-	) {
-		createAd(
-			title: $title
-			description: $description
-			category: $category
-			images: $images
-			adtype: $adtype
-			price: $price
-			usedFor: $usedFor
-			condition: $condition
-			shippingBy: $shippingBy
-			negotiable: $negotiable
-			workingHours: $workingHours
-			workingPeriod: $workingPeriod
-			salaryPeriod: $salaryPeriod
-			offlineOnly: $offlineOnly
-			location: $location
-			createdBy: $createdBy
-		)
-	}
-`
-
-const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
+const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [images, setImages] = useState<Array<string | ArrayBuffer>>([])
 	const [locationListActive, setLocationListActive] = useState<boolean>(false)
 	const [categoryListActive, setCategoryListActive] = useState<boolean>(false)
@@ -162,19 +75,8 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 		}
 	}
 
-	const {
-		data: adData,
-		loading: gettingAdDetails,
-		error: adFetchError
-	} = useQuery<{ ad: AdModel }>(AD_DETAILS, { variables: { slug } })
-
-	console.log(adData)
-
-	const [
-		getUserAds,
-		{ data, loading: gettingUserAds, error: userAdFetchError }
-	] = useLazyQuery(USERS_ADS)
-
+	const [getUserAds, { data, loading: gettingUserAds, error }] =
+		useLazyQuery(USER_ADS)
 	const [uploadAd, { loading: uploadingAd }] = useMutation(CREATE_AD)
 
 	useEffect(() => {
@@ -185,36 +87,24 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 			// @ts-ignore
 			setUserId(session?.user?.sub)
 			// @ts-ignore
-
 			if (width >= 1024) getUserAds({ variables: { id: session?.user?.sub } })
 		}
 
-		if (loading || uploadingAd || gettingAdDetails) setModal(true)
+		if (loading || uploadingAd || gettingUserAds) setModal(true)
 		else setModal(false)
 	}, [loading, uploadingAd, data, width])
 
-	useEffect(() => {
-		if (adData?.ad) {
-			const { ad } = adData
-			setTitle(ad.title)
-			setDescription(ad.description)
-			setCategory(ad.category)
-			setLocation(ad.location)
-			setPrice(ad.price.toString())
-			setUsedFor(ad.usedFor)
-			setWorkingHours(ad.workingHours)
-			setWorkingPeriod(ad.workingPeriod)
-			setSalaryPeriod(ad.salaryPeriod)
-			setAdtype(ad.adtype as Ad)
-			setNegotiable(ad.negotiable)
-			setOfflineOnly(ad.offlineOnly)
-			setCondition(ad.condition as Condition)
-			setDescription(ad.description)
-		}
-		setModal(false)
-	}, [adData])
-
-	useMemo(() => setCategoryList(flatList(categories)), [categories])
+	useMemo(
+		() =>
+			setCategoryList(
+				flatList(
+					categories.filter((x) =>
+						adtype === "Job" ? x.name === "Jobs" : x.name !== "Jobs"
+					)
+				)
+			),
+		[categories]
+	)
 	useMemo(() => setLocationList(districts), [districts])
 
 	const handleClickOutside = (e) => {
@@ -304,7 +194,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 
 			{modal && <Modal title={message} toggle={setModal} fixed />}
 
-			<div className="flex justify-around">
+			<div className="flex justify-around lg:px-12">
 				<form
 					className="flex flex-col sm:w-2/3 p-3"
 					onSubmit={(e) => {
@@ -404,7 +294,8 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 						onChange={(e) => setDescription(e.target.value)}
 						placeholder="Provide a detailed description"
 						required
-						className="border-blood border-2 mb-3 w-full px-2 h-20 focus-visible:outline-none text-gray-600"
+						rows={5}
+						className="border-blood border-2 mb-3 w-full px-2 focus-visible:outline-none text-gray-600"
 					/>
 
 					<label
@@ -419,7 +310,10 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 							type="search"
 							name="category"
 							autoComplete="off"
-							value={category}
+							value={
+								flatList(categories).filter((x) => x._id === category)[0]
+									?.name || ""
+							}
 							id="categoryInput"
 							onFocus={() => setCategoryListActive(true)}
 							onChange={(e) => {
@@ -450,7 +344,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 								<li
 									key={item._id}
 									onClick={() => {
-										setCategory(item.name)
+										setCategory(item._id)
 										setCategoryListActive(false)
 									}}
 									className="px-2 border-b border-gray-100 text-sm md:text-base"
@@ -769,6 +663,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 									key={`ad-${index + 1}`}
 								/>
 							))}
+
 					<div className="pt-4">
 						{gettingUserAds
 							? `Loading Ads...`
@@ -794,15 +689,9 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret, slug }): JSX.Element => {
 
 export default CreateAd
 
-export const getStaticProps: GetStaticProps = ({ params }) => ({
+export const getStaticProps = (context: NextPageContext) => ({
 	props: {
 		cloudinaryUrl: process.env.CLOUDINARY_URL,
-		cloudinarySecret: process.env.CLOUDINARY_SECRET,
-		slug: params.ad
+		cloudinarySecret: process.env.CLOUDINARY_SECRET
 	}
-})
-
-export const getStaticPaths: GetStaticPaths = async () => ({
-	paths: [],
-	fallback: "blocking"
 })

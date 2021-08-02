@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation } from "@apollo/client"
+import { useLazyQuery, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
 import { useSession } from "next-auth/client"
 import Head from "next/head"
@@ -16,72 +16,11 @@ import { Category } from "models/Category"
 import { districts } from "data/districts"
 import { District } from "models/District"
 
+import { CREATE_AD, USER_ADS } from "queries/ads"
+
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
 type Handler = "Buyer" | "Seller"
-
-const USERS_ADS = gql`
-	query getUserAds($id: String) {
-		user(_id: $id) {
-			_id
-			ads {
-				title
-				slug
-				description
-				category
-				images
-				price
-				adtype
-				createdAt
-				negotiable
-				workingHours
-				offlineOnly
-				workingPeriod
-				salaryPeriod
-			}
-		}
-	}
-`
-
-const CREATE_AD = gql`
-	mutation createAd(
-		$title: String
-		$description: String
-		$category: String
-		$images: [String]
-		$price: Float
-		$adtype: String
-		$usedFor: String
-		$condition: String
-		$shippingBy: String
-		$negotiable: Boolean
-		$workingHours: String
-		$workingPeriod: String
-		$salaryPeriod: String
-		$offlineOnly: Boolean
-		$location: String
-		$createdBy: String
-	) {
-		createAd(
-			title: $title
-			description: $description
-			category: $category
-			images: $images
-			adtype: $adtype
-			price: $price
-			usedFor: $usedFor
-			condition: $condition
-			shippingBy: $shippingBy
-			negotiable: $negotiable
-			workingHours: $workingHours
-			workingPeriod: $workingPeriod
-			salaryPeriod: $salaryPeriod
-			offlineOnly: $offlineOnly
-			location: $location
-			createdBy: $createdBy
-		)
-	}
-`
 
 const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [images, setImages] = useState<Array<string | ArrayBuffer>>([])
@@ -137,7 +76,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	}
 
 	const [getUserAds, { data, loading: gettingUserAds, error }] =
-		useLazyQuery(USERS_ADS)
+		useLazyQuery(USER_ADS)
 	const [uploadAd, { loading: uploadingAd }] = useMutation(CREATE_AD)
 
 	useEffect(() => {

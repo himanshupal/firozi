@@ -18,3 +18,60 @@ export const AD_CORE_FIELDS_FRAGMENT = gql`
 		}
 	}
 `
+
+export const CREATE_AD = gql`
+	mutation createAd(
+		$title: String
+		$description: String
+		$category: String
+		$images: [String]
+		$price: Float
+		$adtype: String
+		$usedFor: String
+		$condition: String
+		$shippingBy: String
+		$negotiable: Boolean
+		$workingHours: String
+		$workingPeriod: String
+		$salaryPeriod: String
+		$offlineOnly: Boolean
+		$location: String
+		$createdBy: String
+	) {
+		createAd(
+			title: $title
+			description: $description
+			category: $category
+			images: $images
+			adtype: $adtype
+			price: $price
+			usedFor: $usedFor
+			condition: $condition
+			shippingBy: $shippingBy
+			negotiable: $negotiable
+			workingHours: $workingHours
+			workingPeriod: $workingPeriod
+			salaryPeriod: $salaryPeriod
+			offlineOnly: $offlineOnly
+			location: $location
+			createdBy: $createdBy
+		)
+	}
+`
+
+export const USER_ADS = gql`
+	${AD_CORE_FIELDS_FRAGMENT}
+	query getUserAds($id: String) {
+		user(_id: $id) {
+			_id
+			ads {
+				...AdCoreFields
+				createdAt
+				workingHours
+				offlineOnly
+				workingPeriod
+				salaryPeriod
+			}
+		}
+	}
+`

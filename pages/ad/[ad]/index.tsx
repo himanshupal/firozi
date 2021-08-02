@@ -11,6 +11,8 @@ import userState from "store/user"
 import Modal from "components/Modal"
 import Login from "components/Login"
 
+import { AD_CORE_FIELDS_FRAGMENT } from "queries/ads"
+
 import AdCard from "components/Ad"
 import { toast } from "react-toastify"
 import flatList from "helpers/flatList"
@@ -288,26 +290,18 @@ export const getServerSideProps: GetServerSideProps = async ({
 		error
 	} = await client.query({
 		query: gql`
+			${AD_CORE_FIELDS_FRAGMENT}
 			query ad($slug: String) {
 				ad(slug: $slug) {
-					description
-					category
-					images
-					price
-					adtype
-					location
+					...AdCoreFields
 					salaryPeriod
 					workingPeriod
 					offlineOnly
-					offlineOnly
 					workingHours
 					workingPeriod
-					negotiable
 					usedFor
 					condition
 					shippingBy
-					title
-					_id
 					createdBy {
 						_id
 						name

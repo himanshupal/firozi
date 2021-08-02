@@ -53,9 +53,6 @@ const Query: DocumentNode = gql`
 		saveAd(ad: ID!, user: ID!): Boolean
 		unsaveAd(ad: ID!, user: ID!): Boolean
 	}
-	type Subscription {
-		subTest: Int
-	}
 `
 
 const typeDefs: Array<DocumentNode> = [Query, User, Ad]
