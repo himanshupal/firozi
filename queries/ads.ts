@@ -75,3 +75,34 @@ export const USER_ADS = gql`
 		}
 	}
 `
+
+export const AD = gql`
+	${AD_CORE_FIELDS_FRAGMENT}
+	query ad($slug: String) {
+		ad(slug: $slug) {
+			...AdCoreFields
+			salaryPeriod
+			workingPeriod
+			offlineOnly
+			workingHours
+			workingPeriod
+			usedFor
+			condition
+			shippingBy
+			createdBy {
+				_id
+				name
+				avatar
+				contact
+				email
+				hidden
+				ads {
+					...AdCoreFields
+				}
+			}
+		}
+		similar(slug: $slug) {
+			...AdCoreFields
+		}
+	}
+`

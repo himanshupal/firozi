@@ -10,7 +10,7 @@ export const User: DocumentNode = gql`
 		contact: String
 		hidden: Boolean
 		location: String
-		ads(skip: Int, limit: Int): [Ad]
+		ads(skip: Int, limit: Int, published: Boolean, saved: Boolean): [Ad]
 		saved(skip: Int, limit: Int): [String]
 		follows(skip: Int, limit: Int): [User]
 		createdAt: String!

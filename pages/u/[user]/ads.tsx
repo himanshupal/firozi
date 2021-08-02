@@ -27,10 +27,10 @@ const USER_ADS = gql`
 			published: ads(limit: 3) {
 				...AdCoreFields
 			}
-			drafts: ads {
+			drafts: ads(published: true) {
 				...AdCoreFields
 			}
-			saved: ads {
+			saved: ads(saved: true) {
 				...AdCoreFields
 			}
 		}

@@ -1,4 +1,4 @@
-import { Collection, Cursor, FilterQuery, MongoClient } from "mongodb"
+import { Collection, Cursor, FilterQuery, MongoClient, ObjectId } from "mongodb"
 
 import { getCollection, getClient } from "helpers/dbclient"
 import { Arguments } from "models/Arguments"
@@ -9,14 +9,16 @@ import { GraphQLError } from "graphql"
 const getAds = async (
 	user: User,
 	{
-		limit = 10,
+		limit = 0,
 		skip = 0,
 		filter = "",
 		location = "",
 		sortBy,
 		exclude = [],
 		priceMin = 0,
-		priceMax = 10_000
+		priceMax = 10_000,
+		published,
+		saved
 	}: Arguments
 ): Promise<Array<Ad>> => {
 	try {
@@ -26,11 +28,61 @@ const getAds = async (
 
 		const [sortValue, sortDirection] = (sortBy || "published_Inc").split(/_/)
 
-		const query: FilterQuery<Ad> = {
+		let query: FilterQuery<Ad> = {
 			title: { $regex: filter, $options: "i" },
 			location: { $regex: location, $options: "i" },
 			price: { $gte: priceMin, $lte: priceMax },
-			category: { $nin: exclude }
+			category: { $nin: exclude },
+			published: { $ne: false }
+		}
+
+		if (published === false) {
+			query = { ...query, published: false }
+		}
+
+		if (saved) {
+			const usersCollection: Collection<User> = getCollection<User>(
+				"users",
+				client
+			)
+			const currentUser = await usersCollection
+				.aggregate([
+					{
+						$match: {
+							_id: user._id
+						}
+					},
+					{
+						$addFields: {
+							saved: {
+								$map: {
+									input: "$saved",
+									as: "ad",
+									in: {
+										$toObjectId: "$$ad"
+									}
+								}
+							}
+						}
+					},
+					{
+						$lookup: {
+							from: "ads",
+							localField: "saved",
+							foreignField: "_id",
+							as: "saved"
+						}
+					},
+					{
+						$project: {
+							saved: { $slice: ["$saved", 0, limit || 25] }
+						}
+					}
+				])
+				.next()
+
+			await client.close()
+			return currentUser.saved as Array<Ad>
 		}
 
 		const adsCursor: Cursor<Ad> = adsCollection

@@ -16,8 +16,11 @@ const Query: DocumentNode = gql`
 			priceMin: Float
 			priceMax: Float
 			sortBy: String
+			published: Boolean
+			saved: Boolean
 		): [Ad]
 		ad(slug: String): Ad
+		similar(slug: String): [Ad]
 		maxPrice: Float
 	}
 	type Mutation {

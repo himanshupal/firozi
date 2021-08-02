@@ -1,6 +1,7 @@
 import { IResolvers } from "apollo-server-micro"
 
 import maxPrice from "./maxPrice"
+import similar from "./similar"
 import user from "./user"
 import ads from "./ads"
 import ad from "./ad"
@@ -13,6 +14,7 @@ import saveAd from "./saveAd"
 const resolution: IResolvers = {
 	Query: {
 		maxPrice,
+		similar,
 		user,
 		ads,
 		ad
