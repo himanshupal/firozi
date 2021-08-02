@@ -58,6 +58,7 @@ const EditUser = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	}
 
 	useEffect(() => {
+		if (userId === "") router.push("/")
 		if (userId && !data) getUser({ variables: { id: userId } })
 
 		if (data?.user) {

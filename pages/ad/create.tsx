@@ -16,6 +16,8 @@ import { Category } from "models/Category"
 import { districts } from "data/districts"
 import { District } from "models/District"
 
+import userState from "store/user"
+
 import { CREATE_AD, USER_ADS } from "queries/ads"
 
 type Ad = "Product" | "Job"
@@ -51,14 +53,13 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const categoryListRef = useRef<HTMLUListElement>(null)
 	const locationListRef = useRef<HTMLUListElement>(null)
 
-	const [userId, setUserId] = useState<string>("")
-
 	const [categoryList, setCategoryList] = useState<Array<Category>>()
 	const [locationList, setLocationList] = useState<Array<District>>()
 
-	const [session, loading] = useSession()
 	const router = useRouter()
 	const { width } = getWindowSize()
+
+	const userId = userState((state) => state.userId)
 
 	const imageSelected = (e) => {
 		if (e.target.files) {
@@ -80,19 +81,14 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [uploadAd, { loading: uploadingAd }] = useMutation(CREATE_AD)
 
 	useEffect(() => {
-		if (loading) setMessage("Fetching Session...")
 		if (uploadingAd) setMessage("Saving Data...")
 
-		if (session) {
-			// @ts-ignore
-			setUserId(session?.user?.sub)
-			// @ts-ignore
-			if (width >= 1024) getUserAds({ variables: { id: session?.user?.sub } })
-		}
+		if(userId === "") router.replace("/")
+		if (userId) if (width >= 1024) getUserAds({ variables: { id: userId } })
 
-		if (loading || uploadingAd || gettingUserAds) setModal(true)
+		if (uploadingAd || gettingUserAds) setModal(true)
 		else setModal(false)
-	}, [loading, uploadingAd, data, width])
+	}, [uploadingAd, data, width, userId])
 
 	useMemo(
 		() =>
@@ -656,12 +652,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 						data.user.ads
 							.filter((_, i) => i < 2)
 							.map((ad, index) => (
-								<AdCard
-									ad={ad}
-									// @ts-ignore
-									userId={session?.user?.sub}
-									key={`ad-${index + 1}`}
-								/>
+								<AdCard ad={ad} userId={userId} key={`ad-${index + 1}`} />
 							))}
 
 					<div className="pt-4">
@@ -671,10 +662,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							? `You haven't posted any ads yet!`
 							: data?.user?.ads?.length > 2 && (
 									<div
-										onClick={() =>
-											// @ts-ignore
-											router.push(`/profile/${session?.user?.sub}/ads`)
-										}
+										onClick={() => router.push(`/profile/${userId}/ads`)}
 										className="text-lg font-semibold pt-2 text-center cursor-pointer"
 									>
 										Show more

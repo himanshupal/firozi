@@ -17,12 +17,15 @@ const User = (): JSX.Element => {
 		query: { user }
 	} = useRouter()
 
+	const { push } = useRouter()
+
 	const setLoading = appState((state) => state.setLoading)
 	const userId = userStore((state) => state.userId)
 
 	const [getUser, { data, loading, error }] = useLazyQuery(USER_DETAILS)
 
 	useEffect(() => {
+		if (userId === "") push("/")
 		if (userId && !data) getUser({ variables: { id: userId } })
 		if (loading) setLoading("Getting User Details")
 		return () => setLoading(false)

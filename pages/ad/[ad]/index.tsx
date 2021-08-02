@@ -21,6 +21,19 @@ import { image } from "helpers/getImage"
 
 SwiperCore.use([Pagination, Navigation, Mousewheel])
 
+const Carousel = ({ data, key }) => (
+	<Swiper slidesPerView={"auto"} navigation={true}>
+		{data.map((ad, index) => (
+			<SwiperSlide
+				key={`slide-${key}-${index + 1}`}
+				className="slide__width-auto flex"
+			>
+				<AdCard ad={ad} userId={ad?.createdBy?._id?.toString()} />
+			</SwiperSlide>
+		))}
+	</Swiper>
+)
+
 const Ad = (): JSX.Element => {
 	const [avatar, setAvatar] = useState<string>()
 	const [login, setLogin] = useState<boolean>(false)
@@ -125,7 +138,7 @@ const Ad = (): JSX.Element => {
 							<div className="text-5xl md:text-7xl text-green-800 font-extrabold relative">
 								{data?.ad.title}
 
-								{data.ad.createdBy._id === userId && (
+								{data.ad?.createdBy?._id === userId && (
 									<Link href={`/ad/${slug}/edit`} passHref>
 										<img
 											className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-12 cursor-pointer"
@@ -286,20 +299,7 @@ const Ad = (): JSX.Element => {
 								More Ads by {(userId && data?.ad.createdBy?.name) ?? "User"}
 							</div>
 							<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
-								<Swiper slidesPerView={"auto"} navigation={true}>
-									{data.ad?.createdBy.ads.map((userAd, index) => (
-										<SwiperSlide
-											key={`slide-${index + 1}`}
-											className="slide__width-auto flex"
-										>
-											<AdCard
-												ad={userAd}
-												userId={data.ad?.createdBy._id?.toString()}
-												key={"UserAd-" + index}
-											/>
-										</SwiperSlide>
-									))}
-								</Swiper>
+								<Carousel data={data.ad?.createdBy.ads} key="userAds" />
 							</div>
 						</Fragment>
 					)}
@@ -310,20 +310,7 @@ const Ad = (): JSX.Element => {
 								Latest ads from this category
 							</div>
 							<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
-								<Swiper slidesPerView={"auto"} navigation={true}>
-									{data.similar.map((ad, index) => (
-										<SwiperSlide
-											key={`slide-${index + 1}`}
-											className="slide__width-auto flex"
-										>
-											<AdCard
-												ad={ad}
-												userId={ad.createdBy?._id?.toString()}
-												key={"LatestAd-" + index}
-											/>
-										</SwiperSlide>
-									))}
-								</Swiper>
+								<Carousel data={data.similar} key="similar" />
 							</div>
 						</Fragment>
 					)}

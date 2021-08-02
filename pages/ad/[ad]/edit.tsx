@@ -98,8 +98,9 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	useMemo(() => setLocationList(districts), [districts])
 
 	useEffect(() => {
+		if (userId === "") replace(`/ad/${query.ad}`)
 		if (userId && query.ad) fetchAd()
-	}, [userId])
+	}, [userId, query])
 
 	useEffect(() => {
 		if (data?.ad) {

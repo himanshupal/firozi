@@ -94,9 +94,7 @@ const Header = (): JSX.Element => {
 	const router = useRouter()
 
 	const routeMap = {
-		"/": "Firozi",
-		"/ad/create": "Create new Ad",
-		"/u/edit": "Update profile"
+		"/": "Firozi"
 	}
 
 	const routes = [

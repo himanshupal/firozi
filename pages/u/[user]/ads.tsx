@@ -5,6 +5,7 @@ import { gql, useQuery } from "@apollo/client"
 import AdCard from "components/Ad"
 
 import appState from "store/state"
+import userState from "store/user"
 import shallow from "zustand/shallow"
 
 import { AD_CORE_FIELDS_FRAGMENT } from "queries/ads"
@@ -27,7 +28,7 @@ const USER_ADS = gql`
 			published: ads(limit: 3) {
 				...AdCoreFields
 			}
-			drafts: ads(published: true) {
+			drafts: ads(published: false) {
 				...AdCoreFields
 			}
 			saved: ads(saved: true) {
@@ -37,10 +38,39 @@ const USER_ADS = gql`
 	}
 `
 
+const Carousel = ({ data, title, key }) => (
+	<div>
+		<div className="text-5xl text-center sm:text-left font-bold px-10 lg:px-24 pb-2.5">
+			{title}
+		</div>
+		<div className="w-full flex overflow-auto">
+			<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
+				<Swiper slidesPerView={"auto"} navigation={true}>
+					{data?.map((ad, index) => (
+						<SwiperSlide
+							key={`slide-${key}-${index + 1}`}
+							className="slide__width-auto flex"
+						>
+							<AdCard ad={ad} userId={ad.createdBy?._id?.toString()} />
+						</SwiperSlide>
+					))}
+				</Swiper>
+			</div>
+		</div>
+	</div>
+)
+
 const UserAds = () => {
 	const {
 		query: { user }
 	} = useRouter()
+
+	const { push } = useRouter()
+	const userId = userState((state) => state.userId)
+
+	useEffect(() => {
+		if (userId === "") push("/")
+	}, [userId])
 
 	const { data, loading, error } = useQuery(USER_ADS, { variables: { user } })
 
@@ -61,73 +91,21 @@ const UserAds = () => {
 			</Head>
 
 			<div className="flex flex-col gap-10 py-10">
-				<div>
-					<div className="text-5xl text-center sm:text-left font-bold px-10 lg:px-24 pb-2.5">
-						Live Ads
-					</div>
-					<div className="w-full flex overflow-auto">
-						<Swiper slidesPerView={"auto"} navigation={true}>
-							{data?.user?.published?.map((ad, index) => (
-								<SwiperSlide
-									key={`slide-${index + 1}`}
-									className="slide__width-auto flex"
-								>
-									<AdCard
-										ad={ad}
-										userId={ad.createdBy?._id?.toString()}
-										key={"UserAd-" + index}
-									/>
-								</SwiperSlide>
-							))}
-						</Swiper>
-					</div>
-				</div>
+				{data?.user?.published && (
+					<Carousel
+						title="Live Ads"
+						data={data?.user?.published}
+						key="liveAds"
+					/>
+				)}
 
-				<div>
-					<div className="text-5xl text-center sm:text-left font-bold px-10 lg:px-24 pb-2.5">
-						Saved Ads
-					</div>
-					<div className="w-full flex overflow-auto">
-						<div className="w-full flex md:px-10 pb-0 md:pb-7 overflow-auto">
-							<Swiper slidesPerView={"auto"} navigation={true}>
-								{data?.user?.saved?.map((ad, index) => (
-									<SwiperSlide
-										key={`slide-${index + 1}`}
-										className="slide__width-auto flex"
-									>
-										<AdCard
-											ad={ad}
-											userId={ad.createdBy?._id?.toString()}
-											key={"UserAd-" + index}
-										/>
-									</SwiperSlide>
-								))}
-							</Swiper>
-						</div>
-					</div>
-				</div>
+				{data?.user?.saved && (
+					<Carousel title="Saved Ads" data={data?.user?.saved} key="savedAds" />
+				)}
 
-				<div>
-					<div className="text-5xl text-center sm:text-left font-bold px-10 lg:px-24 pb-2.5">
-						Drafts
-					</div>
-					<div className="w-full flex overflow-auto">
-						<Swiper slidesPerView={"auto"} navigation={true}>
-							{data?.user?.drafts?.map((ad, index) => (
-								<SwiperSlide
-									key={`slide-${index + 1}`}
-									className="slide__width-auto flex"
-								>
-									<AdCard
-										ad={ad}
-										userId={ad.createdBy?._id?.toString()}
-										key={"UserAd-" + index}
-									/>
-								</SwiperSlide>
-							))}
-						</Swiper>
-					</div>
-				</div>
+				{data?.user?.drafts && (
+					<Carousel title="Drafts" data={data?.user?.drafts} key="draftAds" />
+				)}
 			</div>
 		</Fragment>
 	)
