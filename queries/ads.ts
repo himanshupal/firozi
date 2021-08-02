@@ -59,6 +59,55 @@ export const CREATE_AD = gql`
 	}
 `
 
+export const UPDATE_AD = gql`
+	${AD_CORE_FIELDS_FRAGMENT}
+	mutation updateAd(
+		$slug: String
+		$title: String
+		$description: String
+		$category: String
+		$images: [String]
+		$price: Float
+		$usedFor: String
+		$condition: String
+		$shippingBy: String
+		$negotiable: Boolean
+		$workingHours: String
+		$workingPeriod: String
+		$salaryPeriod: String
+		$offlineOnly: Boolean
+		$location: String
+	) {
+		updateAd(
+			slug: $slug
+			title: $title
+			description: $description
+			category: $category
+			images: $images
+			price: $price
+			usedFor: $usedFor
+			condition: $condition
+			shippingBy: $shippingBy
+			negotiable: $negotiable
+			workingHours: $workingHours
+			workingPeriod: $workingPeriod
+			salaryPeriod: $salaryPeriod
+			offlineOnly: $offlineOnly
+			location: $location
+		) {
+			...AdCoreFields
+			salaryPeriod
+			offlineOnly
+			workingHours
+			workingPeriod
+			usedFor
+			condition
+			shippingBy
+			published
+		}
+	}
+`
+
 export const USER_ADS = gql`
 	${AD_CORE_FIELDS_FRAGMENT}
 	query getUserAds($id: String) {
@@ -85,10 +134,10 @@ export const AD = gql`
 			workingPeriod
 			offlineOnly
 			workingHours
-			workingPeriod
 			usedFor
 			condition
 			shippingBy
+			published
 			createdBy {
 				_id
 				name
@@ -103,6 +152,23 @@ export const AD = gql`
 		}
 		similar(slug: $slug) {
 			...AdCoreFields
+		}
+	}
+`
+
+export const EDIT_AD = gql`
+	${AD_CORE_FIELDS_FRAGMENT}
+	query ad($slug: String) {
+		ad(slug: $slug) {
+			...AdCoreFields
+			salaryPeriod
+			offlineOnly
+			workingHours
+			workingPeriod
+			usedFor
+			condition
+			shippingBy
+			published
 		}
 	}
 `

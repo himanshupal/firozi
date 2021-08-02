@@ -120,7 +120,7 @@ const AdCard = ({ userId, ad }: AdProps) => {
 					: ad.description}
 			</div>
 			<div className="border-t-2 flex items-center justify-between py-1 px-3 text-sm">
-				<div className="overflow-ellipsis overflow-x-hidden whitespace-nowrap flex-grow">
+				<div className="overflow-ellipsis text-xs overflow-x-hidden whitespace-nowrap flex-grow">
 					{
 						districts
 							.map(

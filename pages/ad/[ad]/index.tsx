@@ -1,3 +1,4 @@
+import Link from "next/link"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useLazyQuery } from "@apollo/client"
@@ -68,7 +69,7 @@ const Ad = (): JSX.Element => {
 	}
 
 	useEffect(() => {
-		if (userId && slug) getAd()
+		if (userId || slug) getAd()
 	}, [userId, slug])
 
 	useEffect(() => {
@@ -83,6 +84,12 @@ const Ad = (): JSX.Element => {
 			</Head>
 
 			{error && <Modal title={error} fixed />}
+
+			{!data && (
+				<div className="text-lg fotn-bold text-blood first-letter:text-3xl w-full h-full grid place-content-center">
+					Loading...
+				</div>
+			)}
 
 			{data && (
 				<div className="flex flex-col md:flex-row text-blood">
@@ -117,6 +124,16 @@ const Ad = (): JSX.Element => {
 						<div className="px-6 md:px-12 pb-3">
 							<div className="text-5xl md:text-7xl text-green-800 font-extrabold relative">
 								{data?.ad.title}
+
+								{data.ad.createdBy._id === userId && (
+									<Link href={`/ad/${slug}/edit`} passHref>
+										<img
+											className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-12 cursor-pointer"
+											src="/icons/edit.svg"
+											alt="Edit Icon"
+										/>
+									</Link>
+								)}
 								<img
 									className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-0 cursor-pointer"
 									onClick={shareAd}
@@ -140,7 +157,7 @@ const Ad = (): JSX.Element => {
 							<div className="text-3xl md:text-5xl pt-3 pb-5 font-bold text text-red-900">
 								&#8377; {data?.ad.price}/-
 								{data?.ad.salaryPeriod && (
-									<span className="text-2xl md:text-4xl font-light">
+									<span className="text-2xl md:text-4xl font-light pl-2">
 										{durationShort(data?.ad.salaryPeriod)}
 									</span>
 								)}

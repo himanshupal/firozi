@@ -1,22 +1,21 @@
+import Head from "next/head"
 import { useLazyQuery, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
-import { useSession } from "next-auth/client"
-import Head from "next/head"
 import { Fragment, useState, useRef, useEffect, useMemo } from "react"
 
 import Modal from "components/Modal"
 import { toast } from "react-toastify"
-import { NextPageContext } from "next"
+import { GetStaticPaths, NextPageContext } from "next"
 import { useRouter } from "next/router"
-import AdCard from "components/Ad"
-import { getWindowSize } from "helpers/getWindowSize"
 import flatList from "helpers/flatList"
 import categories from "data/categories"
 import { Category } from "models/Category"
 import { districts } from "data/districts"
 import { District } from "models/District"
 
-import { CREATE_AD, USER_ADS } from "queries/ads"
+import userState from "store/user"
+
+import { UPDATE_AD, EDIT_AD } from "queries/ads"
 
 type Ad = "Product" | "Job"
 type Condition = "New" | "Used"
@@ -51,14 +50,12 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const categoryListRef = useRef<HTMLUListElement>(null)
 	const locationListRef = useRef<HTMLUListElement>(null)
 
-	const [userId, setUserId] = useState<string>("")
-
 	const [categoryList, setCategoryList] = useState<Array<Category>>()
 	const [locationList, setLocationList] = useState<Array<District>>()
 
-	const [session, loading] = useSession()
-	const router = useRouter()
-	const { width } = getWindowSize()
+	const userId = userState((state) => state.userId)
+
+	const { query, back, replace } = useRouter()
 
 	const imageSelected = (e) => {
 		if (e.target.files) {
@@ -75,24 +72,17 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		}
 	}
 
-	const [getUserAds, { data, loading: gettingUserAds, error }] =
-		useLazyQuery(USER_ADS)
-	const [uploadAd, { loading: uploadingAd }] = useMutation(CREATE_AD)
+	const [uploadAd, { loading: uploadingAd }] = useMutation(UPDATE_AD)
+	const [fetchAd, { data, loading }] = useLazyQuery(EDIT_AD, {
+		variables: { slug: query.ad }
+	})
 
 	useEffect(() => {
-		if (loading) setMessage("Fetching Session...")
 		if (uploadingAd) setMessage("Saving Data...")
 
-		if (session) {
-			// @ts-ignore
-			setUserId(session?.user?.sub)
-			// @ts-ignore
-			if (width >= 1024) getUserAds({ variables: { id: session?.user?.sub } })
-		}
-
-		if (loading || uploadingAd || gettingUserAds) setModal(true)
+		if (loading || uploadingAd) setModal(true)
 		else setModal(false)
-	}, [loading, uploadingAd, data, width])
+	}, [loading, uploadingAd])
 
 	useMemo(
 		() =>
@@ -106,6 +96,33 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 		[categories]
 	)
 	useMemo(() => setLocationList(districts), [districts])
+
+	useEffect(() => {
+		if (userId && query.ad) fetchAd()
+	}, [userId])
+
+	useEffect(() => {
+		if (data?.ad) {
+			const { ad } = data
+
+			setImages(ad.images)
+			setTitle(ad.title)
+			setDescription(ad.description)
+			setCategory(ad.category)
+			setLocation(ad.location)
+			setPrice(ad.price)
+			setUsedFor(ad.usedFor)
+			setWorkingPeriod(ad.workingPeriod)
+			setSalaryPeriod(ad.salaryPeriod)
+			setAdtype(ad.adtype)
+			setWorkingHours(ad.workingHours)
+			setNegotiable(ad.negotiable)
+			setOfflineOnly(ad.offlineOnly)
+			setCondition(ad.condition)
+			setHandler(ad.shippingBy)
+			setPublished(ad.published)
+		}
+	}, [data])
 
 	const handleClickOutside = (e) => {
 		if (
@@ -137,7 +154,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 		let imageLinks = new Array<string>()
 
-		if (images.length) {
+		if (data?.ad?.images.length !== images.length) {
 			setMessage("Uploading Images...")
 			setModal(true)
 
@@ -159,31 +176,33 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 			)
 		}
 
-		const { data, errors } = await uploadAd({
+		const { data: res, errors } = await uploadAd({
 			variables: filter({
+				slug: query.ad,
 				title,
 				description,
 				category,
-				images: imageLinks,
+				images: [...imageLinks, ...images],
 				location,
 				price: Number(price),
 				usedFor,
 				workingHours,
 				workingPeriod: adtype === "Product" ? "" : workingPeriod,
 				salaryPeriod: adtype === "Product" ? "" : salaryPeriod,
-				adtype,
 				negotiable,
 				offlineOnly,
 				condition: adtype === "Job" ? "" : condition,
 				shippingBy: adtype === "Job" ? "" : handler,
-				published: published && new Date(),
-				createdBy: userId
+				published: published && new Date()
 			})
 		})
 
 		if (errors) console.log(errors.map((x) => x.message))
 
-		if (data.createAd) toast.success("Ad Created !")
+		if (res.updateAd) {
+			toast.success("Ad Updated !")
+			replace(`/ad/${query.ad}`)
+		}
 	}
 
 	return (
@@ -196,7 +215,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 			<div className="flex justify-around lg:px-12">
 				<form
-					className="flex flex-col sm:w-2/3 p-3"
+					className="flex flex-col sm:w-2/3 xl:3/5 p-3"
 					onSubmit={(e) => {
 						e.preventDefault()
 						createAd()
@@ -246,21 +265,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 					>
 						Select Ad Type
 					</label>
-					<div
-						tabIndex={0}
-						onClick={() =>
-							setAdtype((type) =>
-								type === "Job" ? (type = "Product") : (type = "Job")
-							)
-						}
-						onKeyPress={(e) =>
-							e.code === "Space" &&
-							setAdtype((type) =>
-								type === "Job" ? (type = "Product") : (type = "Job")
-							)
-						}
-						className="h-8 w-20 rounded-full mb-3 cursor-pointer flex items-center text-sm justify-center bg-blood text-white"
-					>
+					<div className="h-8 w-20 rounded-full mb-3 cursor-pointer flex items-center text-sm justify-center bg-blue-400 text-gray-200">
 						{adtype}
 					</div>
 
@@ -646,42 +651,14 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 					>
 						Just save for now. I’ll publish it later.
 					</button>
+
+					<div
+						className="text-center text-xs cursor-pointer py-1"
+						onClick={back}
+					>
+						Cancel &amp; Go back
+					</div>
 				</form>
-
-				<div className="flex-col w-1/3 p-3 lg:flex hidden items-center">
-					<div className="text-2xl font-cursive text-center block">
-						Your Previous Ads
-					</div>
-					{data?.user &&
-						data.user.ads
-							.filter((_, i) => i < 2)
-							.map((ad, index) => (
-								<AdCard
-									ad={ad}
-									// @ts-ignore
-									userId={session?.user?.sub}
-									key={`ad-${index + 1}`}
-								/>
-							))}
-
-					<div className="pt-4">
-						{gettingUserAds
-							? `Loading Ads...`
-							: data?.user?.ads?.length === 0
-							? `You haven't posted any ads yet!`
-							: data?.user?.ads?.length > 2 && (
-									<div
-										onClick={() =>
-											// @ts-ignore
-											router.push(`/profile/${session?.user?.sub}/ads`)
-										}
-										className="text-lg font-semibold pt-2 text-center cursor-pointer"
-									>
-										Show more
-									</div>
-							  )}
-					</div>
-				</div>
 			</div>
 		</Fragment>
 	)
@@ -694,4 +671,9 @@ export const getStaticProps = (context: NextPageContext) => ({
 		cloudinaryUrl: process.env.CLOUDINARY_URL,
 		cloudinarySecret: process.env.CLOUDINARY_SECRET
 	}
+})
+
+export const getStaticPaths: GetStaticPaths = async (context) => ({
+	paths: [],
+	fallback: "blocking"
 })

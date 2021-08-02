@@ -53,6 +53,24 @@ const Query: DocumentNode = gql`
 			createdBy: String
 		): Boolean
 
+		updateAd(
+			slug: String
+			title: String
+			description: String
+			category: String
+			images: [String]
+			price: Float
+			usedFor: String
+			condition: String
+			shippingBy: String
+			negotiable: Boolean
+			workingHours: String
+			workingPeriod: String
+			salaryPeriod: String
+			offlineOnly: Boolean
+			location: String
+		): Ad
+
 		saveAd(ad: ID!, user: ID!): Boolean
 		unsaveAd(ad: ID!, user: ID!): Boolean
 	}
