@@ -132,9 +132,6 @@ const AdCard = ({ userId, ad }: AdProps) => {
 							.filter((x) => x)[0]
 					}
 				</div>
-				{ad.published && (
-					<div className="whitespace-nowrap pl-2">{ad.published}</div>
-				)}
 			</div>
 		</div>
 	)

@@ -20,9 +20,6 @@ export const Ad: DocumentNode = gql`
 		workingPeriod: String
 		salaryPeriod: String
 		location: String
-		published: String
-		createdAt: String
-		updatedAt: String
 		createdBy: User
 	}
 `

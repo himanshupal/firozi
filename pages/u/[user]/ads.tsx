@@ -25,10 +25,7 @@ const USER_ADS = gql`
 		user(_id: $user) {
 			_id
 			name
-			published: ads(limit: 3) {
-				...AdCoreFields
-			}
-			drafts: ads(published: false) {
+			ads {
 				...AdCoreFields
 			}
 			saved: ads(saved: true) {
@@ -91,20 +88,12 @@ const UserAds = () => {
 			</Head>
 
 			<div className="flex flex-col gap-10 py-10">
-				{data?.user?.published && (
-					<Carousel
-						title="Live Ads"
-						data={data?.user?.published}
-						key="liveAds"
-					/>
+				{data?.user?.ads && (
+					<Carousel title="Live Ads" data={data?.user?.ads} key="liveAds" />
 				)}
 
 				{data?.user?.saved && (
 					<Carousel title="Saved Ads" data={data?.user?.saved} key="savedAds" />
-				)}
-
-				{data?.user?.drafts && (
-					<Carousel title="Drafts" data={data?.user?.drafts} key="draftAds" />
 				)}
 			</div>
 		</Fragment>

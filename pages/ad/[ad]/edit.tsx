@@ -40,7 +40,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [offlineOnly, setOfflineOnly] = useState<Boolean>(false)
 	const [condition, setCondition] = useState<Condition>("Used")
 	const [handler, setHandler] = useState<Handler>("Buyer")
-	const [published, setPublished] = useState<boolean>(true)
 
 	const [modal, setModal] = useState<Boolean>(false)
 	const [message, setMessage] = useState<string>("")
@@ -121,7 +120,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 			setOfflineOnly(ad.offlineOnly)
 			setCondition(ad.condition)
 			setHandler(ad.shippingBy)
-			setPublished(ad.published)
 		}
 	}, [data])
 
@@ -193,8 +191,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 				negotiable,
 				offlineOnly,
 				condition: adtype === "Job" ? "" : condition,
-				shippingBy: adtype === "Job" ? "" : handler,
-				published: published && new Date()
+				shippingBy: adtype === "Job" ? "" : handler
 			})
 		})
 
@@ -639,18 +636,9 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 					<button
 						type="submit"
-						onClick={() => setPublished(true)}
 						className="h-9 bg-blood border-2 border-white shadow-md drop-shadow-md rounded-md text-white"
 					>
 						Publish Ad
-					</button>
-
-					<button
-						type="submit"
-						onClick={() => setPublished(false)}
-						className="text-blood text-sm text-center mt-2 font-semibold cursor-pointer"
-					>
-						Just save for now. I’ll publish it later.
 					</button>
 
 					<div

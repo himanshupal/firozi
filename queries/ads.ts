@@ -103,7 +103,6 @@ export const UPDATE_AD = gql`
 			usedFor
 			condition
 			shippingBy
-			published
 		}
 	}
 `
@@ -137,7 +136,6 @@ export const AD = gql`
 			usedFor
 			condition
 			shippingBy
-			published
 			createdBy {
 				_id
 				name
@@ -168,7 +166,12 @@ export const EDIT_AD = gql`
 			usedFor
 			condition
 			shippingBy
-			published
 		}
+	}
+`
+
+export const DELETE_AD = gql`
+	mutation deleteAd($slug: String) {
+		deleteAd(slug: $slug)
 	}
 `

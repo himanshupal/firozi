@@ -1,6 +1,5 @@
 import { useLazyQuery, useMutation } from "@apollo/client"
 import { filter } from "helpers/filter"
-import { useSession } from "next-auth/client"
 import Head from "next/head"
 import { Fragment, useState, useRef, useEffect, useMemo } from "react"
 
@@ -43,7 +42,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	const [offlineOnly, setOfflineOnly] = useState<Boolean>(false)
 	const [condition, setCondition] = useState<Condition>("Used")
 	const [handler, setHandler] = useState<Handler>("Buyer")
-	const [published, setPublished] = useState<boolean>(true)
 
 	const [modal, setModal] = useState<Boolean>(false)
 	const [message, setMessage] = useState<string>("")
@@ -83,7 +81,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 	useEffect(() => {
 		if (uploadingAd) setMessage("Saving Data...")
 
-		if(userId === "") router.replace("/")
+		if (userId === "") router.replace("/")
 		if (userId) if (width >= 1024) getUserAds({ variables: { id: userId } })
 
 		if (uploadingAd || gettingUserAds) setModal(true)
@@ -172,7 +170,6 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 				offlineOnly,
 				condition: adtype === "Job" ? "" : condition,
 				shippingBy: adtype === "Job" ? "" : handler,
-				published: published && new Date(),
 				createdBy: userId
 			})
 		})
@@ -308,7 +305,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							autoComplete="off"
 							value={
 								flatList(categories).filter((x) => x._id === category)[0]
-									?.name || ""
+									?.name || category
 							}
 							id="categoryInput"
 							onFocus={() => setCategoryListActive(true)}
@@ -629,18 +626,9 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 
 					<button
 						type="submit"
-						onClick={() => setPublished(true)}
 						className="h-9 bg-blood border-2 border-white shadow-md drop-shadow-md rounded-md text-white"
 					>
 						Publish Ad
-					</button>
-
-					<button
-						type="submit"
-						onClick={() => setPublished(false)}
-						className="text-blood text-sm text-center mt-2 font-semibold cursor-pointer"
-					>
-						Just save for now. I’ll publish it later.
 					</button>
 				</form>
 

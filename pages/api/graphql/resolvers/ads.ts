@@ -1,4 +1,4 @@
-import { Collection, Cursor, FilterQuery, MongoClient, ObjectId } from "mongodb"
+import { Collection, Cursor, FilterQuery, MongoClient } from "mongodb"
 
 import { getCollection, getClient } from "helpers/dbclient"
 import { Arguments } from "models/Arguments"
@@ -15,9 +15,8 @@ const getAds = async (
 		location = "",
 		sortBy,
 		exclude = [],
-		priceMin = 0,
-		priceMax = 10_000,
-		published,
+		priceMin,
+		priceMax,
 		saved
 	}: Arguments
 ): Promise<Array<Ad>> => {
@@ -26,19 +25,19 @@ const getAds = async (
 
 		const adsCollection: Collection<Ad> = getCollection<Ad>("ads", client)
 
-		const [sortValue, sortDirection] = (sortBy || "published_Inc").split(/_/)
+		const [sortValue, sortDirection] = (sortBy || "price_Dec").split(/_/)
 
 		let query: FilterQuery<Ad> = {
 			title: { $regex: filter, $options: "i" },
-			location: { $regex: location, $options: "i" },
-			price: { $gte: priceMin, $lte: priceMax },
-			category: { $nin: exclude },
-			published: { $ne: false }
+			location: { $regex: location, $options: "i" }
 		}
 
-		if (published === false) {
-			query = { ...query, published: false }
-		}
+		if (exclude) query = { ...query, category: { $nin: exclude } }
+
+		if (priceMin) query = { ...query, price: { $gte: priceMin } }
+		if (priceMax) query = { ...query, price: { $lte: priceMax } }
+		if (priceMin || priceMax)
+			query = { ...query, price: { $gte: priceMin, $lte: priceMax } }
 
 		if (saved) {
 			const usersCollection: Collection<User> = getCollection<User>(

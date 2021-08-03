@@ -9,6 +9,5 @@ export interface Arguments {
 	priceMax: number
 	sortBy: string
 
-	published?: boolean
 	saved?: boolean
 }

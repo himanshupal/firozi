@@ -16,7 +16,6 @@ const Query: DocumentNode = gql`
 			priceMin: Float
 			priceMax: Float
 			sortBy: String
-			published: Boolean
 			saved: Boolean
 		): [Ad]
 		ad(slug: String): Ad
@@ -71,6 +70,7 @@ const Query: DocumentNode = gql`
 			location: String
 		): Ad
 
+		deleteAd(slug: String): Boolean
 		saveAd(ad: ID!, user: ID!): Boolean
 		unsaveAd(ad: ID!, user: ID!): Boolean
 	}

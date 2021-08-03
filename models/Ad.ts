@@ -18,7 +18,6 @@ export interface Ad {
 	workingPeriod?: string
 	salaryPeriod?: string
 	offlineOnly?: Boolean
-	published?: boolean | string
 	location?: string
 	createdAt?: string
 	updatedAt?: string

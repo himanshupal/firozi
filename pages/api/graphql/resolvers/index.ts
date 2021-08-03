@@ -7,6 +7,7 @@ import ads from "./ads"
 import ad from "./ad"
 
 import updateUser from "./updateUser"
+import deleteAd from "./deleteAd"
 import updateAd from "./udpateAd"
 import createAd from "./createAd"
 import unsaveAd from "./unsaveAd"
@@ -25,6 +26,7 @@ const resolution: IResolvers = {
 	},
 	Mutation: {
 		updateUser,
+		deleteAd,
 		updateAd,
 		createAd,
 		unsaveAd,

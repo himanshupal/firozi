@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import { useLazyQuery } from "@apollo/client"
+import { useLazyQuery, useMutation } from "@apollo/client"
 import { Fragment, useEffect, useState } from "react"
 import SwiperCore, { Mousewheel, Navigation, Pagination } from "swiper/core"
 import { Swiper, SwiperSlide } from "swiper/react"
@@ -11,7 +11,7 @@ import appState from "store/state"
 import Modal from "components/Modal"
 import Login from "components/Login"
 
-import { AD } from "queries/ads"
+import { AD, DELETE_AD } from "queries/ads"
 
 import AdCard from "components/Ad"
 import { toast } from "react-toastify"
@@ -44,12 +44,23 @@ const Ad = (): JSX.Element => {
 	const userId = userState((state) => state.userId)
 
 	const {
-		query: { ad: slug }
+		query: { ad: slug },
+		back
 	} = useRouter()
 
 	const [getAd, { data, loading, error: errMessage }] = useLazyQuery(AD, {
 		variables: {
 			slug
+		}
+	})
+
+	const [deleteAd] = useMutation(DELETE_AD, {
+		variables: { slug },
+		update: (_, { data }) => {
+			if (data?.deleteAd) {
+				toast.success("Ad Deleted !")
+				back()
+			}
 		}
 	})
 
@@ -139,13 +150,21 @@ const Ad = (): JSX.Element => {
 								{data?.ad.title}
 
 								{data.ad?.createdBy?._id === userId && (
-									<Link href={`/ad/${slug}/edit`} passHref>
+									<Fragment>
+										<Link href={`/ad/${slug}/edit`} passHref>
+											<img
+												className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-24 cursor-pointer"
+												src="/icons/edit.svg"
+												alt="Edit Icon"
+											/>
+										</Link>
 										<img
+											onClick={() => deleteAd()}
 											className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-12 cursor-pointer"
-											src="/icons/edit.svg"
-											alt="Edit Icon"
+											src="/icons/delete.svg"
+											alt="Delete Icon"
 										/>
-									</Link>
+									</Fragment>
 								)}
 								<img
 									className="w-6 h-6 md:h-8 md:w-8 absolute top-0 right-0 cursor-pointer"
