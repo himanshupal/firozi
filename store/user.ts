@@ -20,7 +20,7 @@ export default create<UserDetails>(
 			setUserAvatar: (url: string) =>
 				set((state) => ({ ...state, avatar: url })),
 
-			purgeUserDetails: () => set({}, true)
+			purgeUserDetails: () => set({})
 		}),
 		{ name: "user-details" }
 	)

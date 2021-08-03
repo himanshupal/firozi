@@ -6,7 +6,7 @@ export const icon = (
 ) =>
 	url
 		.replace(/upload/, `upload/c_limit,h_${height},q_${quality},w_${width}`)
-		.replace(/^http/, "https")
+		.replace(/^http:/, "https")
 
 export const profile = (
 	url: string,
@@ -16,7 +16,7 @@ export const profile = (
 ) =>
 	url
 		.replace(/upload/, `upload/c_limit,h_${height},q_${quality},w_${width}`)
-		.replace(/^http/, "https")
+		.replace(/^http:/, "https")
 
 export const image = (
 	url: string,

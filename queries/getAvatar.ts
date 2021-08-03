@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client"
 
 const GET_AVATAR = gql`
-	query getAvatar($id: String!) {
+	query getAvatar($id: ID) {
 		user(_id: $id) {
 			_id
 			avatar

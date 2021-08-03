@@ -662,7 +662,7 @@ const CreateAd = ({ cloudinaryUrl, cloudinarySecret }): JSX.Element => {
 							? `You haven't posted any ads yet!`
 							: data?.user?.ads?.length > 2 && (
 									<div
-										onClick={() => router.push(`/profile/${userId}/ads`)}
+										onClick={() => router.push(`/u/${userId}/ads`)}
 										className="text-lg font-semibold pt-2 text-center cursor-pointer"
 									>
 										Show more

@@ -110,7 +110,7 @@ export const UPDATE_AD = gql`
 
 export const USER_ADS = gql`
 	${AD_CORE_FIELDS_FRAGMENT}
-	query getUserAds($id: String) {
+	query getUserAds($id: ID) {
 		user(_id: $id) {
 			_id
 			ads {
