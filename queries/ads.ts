@@ -114,7 +114,6 @@ export const USER_ADS = gql`
 			_id
 			ads {
 				...AdCoreFields
-				createdAt
 				workingHours
 				offlineOnly
 				workingPeriod
