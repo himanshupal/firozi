@@ -10,12 +10,6 @@ const Footer = (): JSX.Element => {
 					Report an Issue
 				</Link>
 			</div>
-			<div className="hidden sm:block">
-				Final year project for BCA by{` `}
-				<Link href="https://github.com/himanshupal">Himanshu Pal</Link>, Chetan
-				Gupta &amp;{` `}
-				<Link href="https://github.com/mansi-creater">Mansi Srivastava</Link>
-			</div>
 		</footer>
 	)
 }
